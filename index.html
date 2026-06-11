@@ -529,8 +529,8 @@
     <button class="filter-btn"        data-cat="stories"     data-ar="القصص والروايات"      data-en="Stories"          onclick="filterBy(this)">القصص والروايات</button>
     <button class="filter-btn"        data-cat="health"      data-ar="الصحة والبيئة"       data-en="Health & Nature"  onclick="filterBy(this)">الصحة والبيئة</button>
     <button class="filter-btn"        data-cat="lifeskills"  data-ar="مهارات الحياة"       data-en="Life Skills"      onclick="filterBy(this)">مهارات الحياة</button>
-    <button class="filter-btn"        data-cat="calendar"    data-ar="التقويم الأكاديمي"   data-en="Academic Calendar" onclick="filterBy(this)">📅 التقويم</button>
-    <button class="filter-btn"        data-cat="manahil"     data-ar="مناهل الزاد"         data-en="Manahil Al-Zad"   onclick="filterBy(this)">🌿 مناهل الزاد</button>
+    <button class="filter-btn"        data-cat="calendar"    data-ar="التقويم الأكاديمي"   data-en="Academic Calendar" onclick="filterBy(this)">التقويم</button>
+    <button class="filter-btn"        data-cat="manahil"     data-ar="مناهل الزاد"         data-en="Manahil Al-Zad"   onclick="filterBy(this)">مناهل الزاد</button>
 
   </div>
 
@@ -539,7 +539,7 @@
 
     <!-- SUMMER READS SECTION (auto-shown June–Aug) -->
     <div class="summer-section" id="summerSection" style="display:none;">
-      <div class="summer-banner">
+      <div class="summer-banner" onclick="filterBySummer()" style="cursor:pointer;" title="اضغطي لعرض كتب الصيف">
         <div class="summer-banner-eyebrow" id="summerEyebrow">✨ اختيار خاص</div>
         <h2 id="summerTitle">صيفنا قراءة 🌞</h2>
         <p id="summerDesc">كتب مختارة بعناية لتُرافقك في إجازتك — خفيفة، ممتعة، ومفيدة</p>
@@ -788,6 +788,13 @@
     // ────────────────────────────────────────────
     // FILTER
     // ────────────────────────────────────────────
+    function filterBySummer() {
+      currentFilter = 'summer';
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      renderBooks();
+      document.querySelector('.section-divider, .summer-divider')?.scrollIntoView({behavior:'smooth'});
+    }
+
     function filterBy(btn) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -834,7 +841,9 @@
         const reads   = readCounts[b.id] || 0;
         const popular = reads >= 5 ? `<span style="color:var(--accent-2);font-weight:700;">★</span> ` : '';
         const coverHtml = b.cover
-          ? `<img src="${b.cover}" alt="${title}" style="width:100%;aspect-ratio:3/4;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="book-cover ${b.lang === 'english' ? 'lang-en' : ''}" style="display:none">${b.emoji}</div>`
+          ? `<div class="book-cover ${b.lang === 'english' ? 'lang-en' : ''}" style="padding:0;background:#f0f0f0;position:relative;">
+              <img src="${b.cover}" alt="${title}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;" onerror="this.parentElement.innerHTML='${b.emoji}'">
+             </div>`
           : `<div class="book-cover ${b.lang === 'english' ? 'lang-en' : ''}">${b.emoji}</div>`;
         return `
           <div class="book-card" onclick="openBook(${b.id})">
