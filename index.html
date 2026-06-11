@@ -601,9 +601,7 @@
     const SUPABASE_URL  = 'https://tjdznavmbudvjngdekqr.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqZHpuYXZtYnVkdmpuZ2Rla3FyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDQ1ODIsImV4cCI6MjA5Njc4MDU4Mn0.WI9KndkDyCk8IuxqcacNkui-9tCXFy3XR-z8Tast2tM';
 
-    const sb = (SUPABASE_URL !== 'https://tjdznavmbudvjngdekqr.supabase.co')
-      ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
-      : null;
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
     // ────────────────────────────────────────────
     // BOOK DATA — 100 books across 8 categories
