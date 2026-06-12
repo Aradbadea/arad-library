@@ -572,6 +572,7 @@
     <button class="filter-btn"        data-cat="calendar"    data-ar="التقويم الأكاديمي"   data-en="Academic Calendar" onclick="filterBy(this)">التقويم</button>
     <button class="filter-btn"        data-cat="manahil"     data-ar="مناهل الزاد"         data-en="Manahil Al-Zad"   onclick="filterBy(this)">مناهل الزاد</button>
     <button class="filter-btn"        data-cat="special"     data-ar="دعم الفئات"          data-en="Special Support"  onclick="filterBy(this)">دعم الفئات</button>
+    <button class="filter-btn"        data-cat="arabic_reading" data-ar="تحدي القراءة العربي"  data-en="Arab Reading Challenge" onclick="filterBy(this)">تحدي القراءة العربي</button>
 
   </div>
 
@@ -731,6 +732,7 @@
       calendar:    { ar: "التقويم الأكاديمي",       en: "Academic Calendar"},
       manahil:     { ar: "مناهل الزاد",              en: "Manahil Al-Zad"   },
       special:     { ar: "دعم الفئات",               en: "Special Support"  },
+      arabic_reading: { ar: "تحدي القراءة العربي",  en: "Arab Reading Challenge" },
       summer:      { ar: "صيفنا قراءة",       en: "Summer Reads"    },
     };
 
@@ -861,7 +863,7 @@
     }
 
     function renderCategoryBlocks(isEn, grid) {
-      const catOrder = ['citizenship','heritage','languages','islamic','general','stories','health','lifeskills','calendar','manahil','special'];
+      const catOrder = ['citizenship','heritage','languages','islamic','general','stories','health','lifeskills','calendar','manahil','special','arabic_reading'];
       const catEmojis = {
         citizenship:'🇧🇭', heritage:'📜', languages:'🌐', islamic:'☪️',
         general:'🔬', stories:'📖', health:'💚', lifeskills:'🎯',
@@ -928,7 +930,8 @@
     async function renderPDFCover(imgId, pdfUrl) {
       if (typeof pdfjsLib === 'undefined') return;
       try {
-        const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+        const rawUrl = 'https://raw.githubusercontent.com/Aradbadea/arad-library/main/' + pdfUrl;
+        const pdf = await pdfjsLib.getDocument(rawUrl).promise;
         const page = await pdf.getPage(1);
         const viewport = page.getViewport({ scale: 1.5 });
         const canvas = document.createElement('canvas');
