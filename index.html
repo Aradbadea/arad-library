@@ -617,7 +617,16 @@
         <button class="modal-close" onclick="closeModalDirect()">✕</button>
       </div>
       <div class="modal-body">
-        <iframe class="pdf-viewer" id="pdfViewer" src=""></iframe>
+        <iframe class="pdf-viewer" id="pdfViewer" src="" style="display:none;"></iframe>
+        <div id="iosReaderMsg" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:20px;">
+          <div style="font-size:64px;">📖</div>
+          <div style="font-size:18px;font-weight:700;color:var(--ink);" id="iosMsgTitle"></div>
+          <a id="iosOpenBtn" href="#" target="_blank"
+            style="background:var(--accent);color:white;padding:14px 32px;border-radius:24px;font-size:16px;font-weight:700;text-decoration:none;display:inline-block;">
+            اضغطي هنا لقراءة الكتاب
+          </a>
+          <p style="font-size:12px;color:var(--muted);">يفتح في قارئ PDF</p>
+        </div>
       </div>
       <div class="modal-footer">
         <a class="btn-primary" id="downloadBtn" href="#" download
@@ -1027,7 +1036,19 @@
         (b.isbn      ? `<span>${isbnLabel}: <strong>${b.isbn}</strong></span><br>` : '') +
         (b.publisher ? `<span>${pubLabel}: <strong>${isEn ? b.publisher : b.publisher}</strong></span><br>` : '') +
         (b.year      ? `<span>${yearLabel}: <strong>${b.year}</strong></span>` : '');
-      document.getElementById('pdfViewer').src           = b.file;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        document.getElementById('pdfViewer').style.display = 'none';
+        const msg = document.getElementById('iosReaderMsg');
+        msg.style.display = 'flex';
+        document.getElementById('iosMsgTitle').textContent = title;
+        document.getElementById('iosOpenBtn').href = b.file;
+      } else {
+        document.getElementById('iosReaderMsg').style.display = 'none';
+        const viewer = document.getElementById('pdfViewer');
+        viewer.style.display = 'block';
+        viewer.src = b.file;
+      }
       document.getElementById('downloadBtn').href        = b.file;
       document.getElementById('downloadBtn').textContent = isEn ? 'Download Book' : 'تحميل الكتاب';
       document.getElementById('modalOverlay').classList.add('open');
@@ -1042,6 +1063,8 @@
     function closeModalDirect() {
       document.getElementById('modalOverlay').classList.remove('open');
       document.getElementById('pdfViewer').src = '';
+      document.getElementById('pdfViewer').style.display = 'none';
+      document.getElementById('iosReaderMsg').style.display = 'none';
       document.body.style.overflow = '';
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
