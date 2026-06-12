@@ -255,7 +255,7 @@
     }
 
     /* ── GRID ── */
-    .grid { display: block; width: 100%; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
     .book-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -399,10 +399,10 @@
       to { transform: translateY(0); opacity: 1; }
     }
     .modal-header {
-      padding: 14px 20px 12px;
+      padding: 12px 20px;
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; gap: 14px;
-      flex-shrink: 0;
+      flex-shrink: 0; overflow-y: auto; max-height: 140px;
     }
     .modal-cover {
       width: 68px; height: 92px; border-radius: 8px;
@@ -418,11 +418,11 @@
       cursor: pointer; color: var(--muted); padding: 4px;
     }
     .modal-body {
-      flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0;
+      flex: 1; min-height: 0; display: flex; flex-direction: column;
     }
-    .pdf-viewer { border: none; width: 100%; flex: 1; display: block; min-height: 0; height: 100%; }
+    .pdf-viewer { border: none; width: 100%; height: 100%; flex: 1; display: block; }
     .modal-footer {
-      padding: 10px 20px; border-top: 1px solid var(--border);
+      padding: 8px 20px; border-top: 1px solid var(--border);
       display: flex; gap: 12px; justify-content: center; flex-shrink: 0;
     }
     .btn-primary {
@@ -839,10 +839,10 @@
       document.getElementById('summerPageGrid').innerHTML = picks.map(b => {
         const title  = isEn ? b.title_en : b.title_ar;
         const author = isEn ? b.author_en : b.author_ar;
-                                        const canvasId = `cover-${b.id}`;
-        const coverHtml = `<div class="book-cover ${b.lang==='english'?'lang-en':''}" style="position:relative;">
+                                        const imgId = `cover-${b.id}`;
+        const coverHtml = `<div class="book-cover ${b.lang==='english'?'lang-en':''}" style="position:relative;overflow:hidden;">
           <span style="font-size:52px;position:relative;z-index:1;">${b.emoji}</span>
-          <canvas id="${canvasId}" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"></canvas>
+          <img id="${imgId}" data-pdf="${b.file}" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" alt="">
         </div>`;
         return `<div class="book-card" onclick="openBook(${b.id});closeSummerPage()">
           ${coverHtml}
@@ -912,6 +912,7 @@
         b.classList.toggle('active', b.dataset.cat === cat);
       });
       renderBooks();
+      setTimeout(renderCoversForVisible, 400);
     }
 
     function filterBy(btn) {
@@ -924,22 +925,31 @@
     // ────────────────────────────────────────────
     // RENDER BOOKS
     // ────────────────────────────────────────────
-    async function renderPDFCover(canvasId, pdfUrl) {
+    async function renderPDFCover(imgId, pdfUrl) {
       if (typeof pdfjsLib === 'undefined') return;
       try {
         const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
         const page = await pdf.getPage(1);
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        const viewport = page.getViewport({ scale: 1 });
-        const scale = canvas.parentElement.offsetWidth / viewport.width || 1;
-        const scaled = page.getViewport({ scale });
-        canvas.width = scaled.width;
-        canvas.height = scaled.height;
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport: scaled }).promise;
-        canvas.style.display = 'block';
-        canvas.previousElementSibling && (canvas.previousElementSibling.style.display = 'none');
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        const img = document.getElementById(imgId);
+        if (!img) return;
+        img.src = canvas.toDataURL();
+        img.style.display = 'block';
+        img.previousElementSibling && (img.previousElementSibling.style.display = 'none');
       } catch(e) { /* keep emoji fallback */ }
+    }
+
+    function renderCoversForVisible() {
+      document.querySelectorAll('img[data-pdf]').forEach(img => {
+        if (!img.dataset.loaded) {
+          img.dataset.loaded = '1';
+          renderPDFCover(img.id, img.dataset.pdf);
+        }
+      });
     }
 
     function renderBooks() {
@@ -1094,11 +1104,7 @@
     initSummer();
     renderBooks();
     // Render PDF covers after cards are in DOM
-    setTimeout(() => {
-      books.forEach(b => {
-        if (b.file) renderPDFCover(`cover-${b.id}`, b.file);
-      });
-    }, 300);
+    setTimeout(renderCoversForVisible, 400);
   </script>
 
   <!-- ── SUMMER PAGE ── -->
