@@ -633,7 +633,6 @@
        SUPABASE CONFIG — paste your keys here
   ════════════════════════════════════════════ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
     // ┌─────────────────────────────────────────────────────────┐
     // │  STEP 1: Replace these two values with your Supabase    │
@@ -641,11 +640,6 @@
     // └─────────────────────────────────────────────────────────┘
     const SUPABASE_URL  = 'https://tjdznavmbudvjngdekqr.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqZHpuYXZtYnVkdmpuZ2Rla3FyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDQ1ODIsImV4cCI6MjA5Njc4MDU4Mn0.WI9KndkDyCk8IuxqcacNkui-9tCXFy3XR-z8Tast2tM';
-
-    // PDF.js worker
-    if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
 
     let sb = null;
     try {
@@ -664,60 +658,60 @@
     // ────────────────────────────────────────────
     const books = [
       // ── المواطنة ──
-      { id:1,  title_ar:"ميثاق العمل الوطني",               title_en:"National Action Charter",              author_ar:"مملكة البحرين",          author_en:"Kingdom of Bahrain",     category:"citizenship", lang:"arabic",  emoji:"🇧🇭", isbn:"", publisher:"مملكة البحرين",      year:"2001", file:"mithaq-bahrain.pdf", cover:"" },
-      { id:2,  title_ar:"الكاريكاتير والتنمية السياسية في البحرين", title_en:"Caricature and Political Development in Bahrain", author_ar:"مؤلف بحريني", author_en:"Bahraini Author", category:"citizenship", lang:"arabic",  emoji:"🎨", isbn:"", publisher:"البحرين",           year:"2024", file:"Caricature-political-development-bahrain.pdf", cover:"" },
+      { id:1,  title_ar:"ميثاق العمل الوطني",               title_en:"National Action Charter",              author_ar:"مملكة البحرين",          author_en:"Kingdom of Bahrain",     category:"citizenship", lang:"arabic",  emoji:"🇧🇭", isbn:"", publisher:"مملكة البحرين",      year:"2001", file:"mithaq-bahrain.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/mithaq-bahrain.jpg" },
+      { id:2,  title_ar:"الكاريكاتير والتنمية السياسية في البحرين", title_en:"Caricature and Political Development in Bahrain", author_ar:"مؤلف بحريني", author_en:"Bahraini Author", category:"citizenship", lang:"arabic",  emoji:"🎨", isbn:"", publisher:"البحرين",           year:"2024", file:"Caricature-political-development-bahrain.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/Caricature-political-development-bahrain.jpg" },
 
       // ── التراث العربي ──
-      { id:3,  title_ar:"كليلة ودمنة",                      title_en:"Kalila and Dimna",                     author_ar:"ابن المقفع",              author_en:"Ibn Al-Muqaffa",         category:"heritage",    lang:"arabic",  emoji:"🦁", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2013", file:"kalila-dimna.pdf", cover:"" },
-      { id:4,  title_ar:"شرح ديوان المتنبي",                title_en:"Commentary on Al-Mutanabbi's Poems",   author_ar:"أبو الطيب المتنبي",       author_en:"Al-Mutanabbi",           category:"heritage",    lang:"arabic",  emoji:"✍️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2015", file:"mutanabbi.pdf", cover:"" },
-      { id:5,  title_ar:"خلاصة تاريخ العرب",                title_en:"Summary of Arab History",              author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"heritage",    lang:"arabic",  emoji:"📜", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019", file:"arab-history-summary.pdf", cover:"" },
-      { id:6,  title_ar:"حضارة العرب في الأندلس",           title_en:"Arab Civilization in Andalusia",        author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"heritage",    lang:"arabic",  emoji:"🏰", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019", file:"arabs-in-andalus.pdf", cover:"" },
+      { id:3,  title_ar:"كليلة ودمنة",                      title_en:"Kalila and Dimna",                     author_ar:"ابن المقفع",              author_en:"Ibn Al-Muqaffa",         category:"heritage",    lang:"arabic",  emoji:"🦁", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2013", file:"kalila-dimna.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/kalila-dimna.jpg" },
+      { id:4,  title_ar:"شرح ديوان المتنبي",                title_en:"Commentary on Al-Mutanabbi's Poems",   author_ar:"أبو الطيب المتنبي",       author_en:"Al-Mutanabbi",           category:"heritage",    lang:"arabic",  emoji:"✍️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2015", file:"mutanabbi.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/mutanabbi.jpg" },
+      { id:5,  title_ar:"خلاصة تاريخ العرب",                title_en:"Summary of Arab History",              author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"heritage",    lang:"arabic",  emoji:"📜", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019", file:"arab-history-summary.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/arab-history-summary.jpg" },
+      { id:6,  title_ar:"حضارة العرب في الأندلس",           title_en:"Arab Civilization in Andalusia",        author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"heritage",    lang:"arabic",  emoji:"🏰", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019", file:"arabs-in-andalus.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/arabs-in-andalus.jpg" },
 
       // ── اللغات ──
-      { id:7,  title_ar:"تعلَّم لغة جديدة بسرعة وسهولة",   title_en:"Learn a New Language Quickly and Easily", author_ar:"بيل هاندلي",            author_en:"Bill Handley",           category:"languages",   lang:"arabic",  emoji:"🌐", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2016", file:"learn-new-language.pdf", cover:"" },
+      { id:7,  title_ar:"تعلَّم لغة جديدة بسرعة وسهولة",   title_en:"Learn a New Language Quickly and Easily", author_ar:"بيل هاندلي",            author_en:"Bill Handley",           category:"languages",   lang:"arabic",  emoji:"🌐", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2016", file:"learn-new-language.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/learn-new-language.jpg" },
 
       // ── الحضارة الإسلامية ──
-      { id:8,  title_ar:"رحلة ابن بطوطة",                   title_en:"Travels of Ibn Battuta",               author_ar:"ابن بطوطة",               author_en:"Ibn Battuta",            category:"islamic",     lang:"arabic",  emoji:"🗺️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2014", file:"ibn-battuta.pdf", cover:"" },
-      { id:9,  title_ar:"بناة الإسلام: محمد وخلفاؤه",      title_en:"Builders of Islam",                    author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"islamic",     lang:"arabic",  emoji:"☪️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2018", file:"builders-of-islam.pdf", cover:"" },
-      { id:10, title_ar:"الحضارة الإسلامية",                title_en:"Islamic Civilization",                 author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"islamic",     lang:"arabic",  emoji:"🕌", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2018", file:"islamic-civilization.pdf", cover:"" },
-      { id:11, title_ar:"الإسلام والحضارة العربية",         title_en:"Islam and Arab Civilization",          author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"islamic",     lang:"arabic",  emoji:"✨", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2017", file:"islam-arab-civilization.pdf", cover:"" },
-      { id:12, title_ar:"صلاح الدين الأيوبي وعصره",         title_en:"Saladin and His Era",                  author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"islamic",     lang:"arabic",  emoji:"⚔️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019", file:"salahuddin.pdf", cover:"" },
-      { id:13, title_ar:"أضواء من المولد السعيد",           title_en:"The Prophet's Life — Part 1",          author_ar:"سلسلة من حياة الرسول",   author_en:"Prophet's Life Series",  category:"islamic",     lang:"arabic",  emoji:"🌟", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"prophet-life-1.pdf", cover:"" },
-      { id:14, title_ar:"بين عصر الظلام ومطلع الفجر",      title_en:"The Prophet's Life — Part 2",          author_ar:"سلسلة من حياة الرسول",   author_en:"Prophet's Life Series",  category:"islamic",     lang:"arabic",  emoji:"🌙", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"prophet-life-2.pdf", cover:"" },
-      { id:15, title_ar:"هجرة الصحابة — إسلام عمر",        title_en:"The Prophet's Life — Part 3",          author_ar:"سلسلة من حياة الرسول",   author_en:"Prophet's Life Series",  category:"islamic",     lang:"arabic",  emoji:"🌠", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"prophet-life-3.pdf", cover:"" },
-      { id:16, title_ar:"شدائد وأزمات",                     title_en:"The Prophet's Life — Part 4",          author_ar:"سلسلة من حياة الرسول",   author_en:"Prophet's Life Series",  category:"islamic",     lang:"arabic",  emoji:"💫", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"prophet-life-4.pdf", cover:"" },
+      { id:8,  title_ar:"رحلة ابن بطوطة",                   title_en:"Travels of Ibn Battuta",               author_ar:"ابن بطوطة",               author_en:"Ibn Battuta",            category:"islamic",     lang:"arabic",  emoji:"🗺️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2014", file:"ibn-battuta.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/ibn-battuta.jpg" },
+      { id:9,  title_ar:"بناة الإسلام: محمد وخلفاؤه",      title_en:"Builders of Islam",                    author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"islamic",     lang:"arabic",  emoji:"☪️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2018", file:"builders-of-islam.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/builders-of-islam.jpg" },
+      { id:10, title_ar:"الحضارة الإسلامية",                title_en:"Islamic Civilization",                 author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"islamic",     lang:"arabic",  emoji:"🕌", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2018", file:"islamic-civilization.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/islamic-civilization.jpg" },
+      { id:11, title_ar:"الإسلام والحضارة العربية",         title_en:"Islam and Arab Civilization",          author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"islamic",     lang:"arabic",  emoji:"✨", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2017", file:"islam-arab-civilization.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/islam-arab-civilization.jpg" },
+      { id:12, title_ar:"صلاح الدين الأيوبي وعصره",         title_en:"Saladin and His Era",                  author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"islamic",     lang:"arabic",  emoji:"⚔️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019", file:"salahuddin.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/salahuddin.jpg" },
+      { id:13, title_ar:"أضواء من المولد السعيد",           title_en:"The Prophet's Life — Part 1",          author_ar:"سلسلة من حياة الرسول",   author_en:"Prophet's Life Series",  category:"islamic",     lang:"arabic",  emoji:"🌟", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"prophet-life-1.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/prophet-life-1.jpg" },
+      { id:14, title_ar:"بين عصر الظلام ومطلع الفجر",      title_en:"The Prophet's Life — Part 2",          author_ar:"سلسلة من حياة الرسول",   author_en:"Prophet's Life Series",  category:"islamic",     lang:"arabic",  emoji:"🌙", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"prophet-life-2.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/prophet-life-2.jpg" },
+      { id:15, title_ar:"هجرة الصحابة — إسلام عمر",        title_en:"The Prophet's Life — Part 3",          author_ar:"سلسلة من حياة الرسول",   author_en:"Prophet's Life Series",  category:"islamic",     lang:"arabic",  emoji:"🌠", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"prophet-life-3.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/prophet-life-3.jpg" },
+      { id:16, title_ar:"شدائد وأزمات",                     title_en:"The Prophet's Life — Part 4",          author_ar:"سلسلة من حياة الرسول",   author_en:"Prophet's Life Series",  category:"islamic",     lang:"arabic",  emoji:"💫", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"prophet-life-4.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/prophet-life-4.jpg" },
 
       // ── المعلومات العامة ──
-      { id:17, title_ar:"سبعة أعمدة للعلم",                 title_en:"Seven Pillars of Science",             author_ar:"جون جريبين",              author_en:"John Gribbin",           category:"general",     lang:"arabic",  emoji:"🔬", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2021", file:"seven-pillars.pdf", cover:"" },
-      { id:18, title_ar:"رحلة عبر الكواكب",                 title_en:"A Journey Through the Planets",        author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"general",     lang:"arabic",  emoji:"🪐", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019", file:"planet-travel.pdf", cover:"" },
-      { id:19, title_ar:"العدّ التنازلي للفضاء",             title_en:"Space Countdown",                      author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"general",     lang:"arabic",  emoji:"🚀", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"space-countdown.pdf", cover:"" },
-      { id:20, title_ar:"رحلات الفضاء",                     title_en:"Space Trips",                          author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"general",     lang:"arabic",  emoji:"🌌", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"space-trips.pdf", cover:"" },
-      { id:21, title_ar:"تاريخ النبات عند العرب",            title_en:"History of Botany Among the Arabs",    author_ar:"أحمد عيسى",               author_en:"Ahmed Issa",             category:"general",     lang:"arabic",  emoji:"🌿", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2013", file:"arab-botany-history.pdf", cover:"" },
+      { id:17, title_ar:"سبعة أعمدة للعلم",                 title_en:"Seven Pillars of Science",             author_ar:"جون جريبين",              author_en:"John Gribbin",           category:"general",     lang:"arabic",  emoji:"🔬", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2021", file:"seven-pillars.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/seven-pillars.jpg" },
+      { id:18, title_ar:"رحلة عبر الكواكب",                 title_en:"A Journey Through the Planets",        author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"general",     lang:"arabic",  emoji:"🪐", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019", file:"planet-travel.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/planet-travel.jpg" },
+      { id:19, title_ar:"العدّ التنازلي للفضاء",             title_en:"Space Countdown",                      author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"general",     lang:"arabic",  emoji:"🚀", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"space-countdown.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/space-countdown.jpg" },
+      { id:20, title_ar:"رحلات الفضاء",                     title_en:"Space Trips",                          author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"general",     lang:"arabic",  emoji:"🌌", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"space-trips.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/space-trips.jpg" },
+      { id:21, title_ar:"تاريخ النبات عند العرب",            title_en:"History of Botany Among the Arabs",    author_ar:"أحمد عيسى",               author_en:"Ahmed Issa",             category:"general",     lang:"arabic",  emoji:"🌿", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2013", file:"arab-botany-history.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/arab-botany-history.jpg" },
 
       // ── القصص والروايات ──
-      { id:22, title_ar:"حكايات إيسوب",                     title_en:"Aesop's Fables",                       author_ar:"إيسوب",                   author_en:"Aesop",                  category:"stories",     lang:"english", emoji:"🦊", isbn:"",    publisher:"Planet eBook",   year:"620BC", file:"aesops-fables.pdf", cover:"" },
-      { id:23, title_ar:"مغامرات أليس في بلاد العجائب",     title_en:"Alice's Adventures in Wonderland",     author_ar:"لويس كارول",              author_en:"Lewis Carroll",          category:"stories",     lang:"english", emoji:"🐇", isbn:"",    publisher:"Planet eBook",   year:"1865",  file:"alices-adventures-in-wonderland.pdf", cover:"" },
-      { id:24, title_ar:"حكايات هانس أندرسن الخيالية",      title_en:"Hans Andersen's Fairy Tales",          author_ar:"هانس كريستيان أندرسن",   author_en:"Hans Christian Andersen",category:"stories",     lang:"arabic",  emoji:"❄️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019",  file:"anderson-fairytales.pdf", cover:"" },
-      { id:25, title_ar:"قصص صينية للأطفال",                title_en:"Chinese Stories for Children",         author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"stories",     lang:"arabic",  emoji:"🐉", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020",  file:"chinese-stories.pdf", cover:"" },
-      { id:26, title_ar:"الفتاة التي شربت من ضوء القمر",    title_en:"The Girl Who Drank the Moon",          author_ar:"كيلي برنهيل",             author_en:"Kelly Barnhill",         category:"stories",     lang:"arabic",  emoji:"🌛", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2021",  file:"moonlight-girl.pdf", cover:"" },
-      { id:27, title_ar:"حيث يلتقي الجبل والقمر",           title_en:"Where the Mountain Meets the Moon",    author_ar:"جريس لين",                author_en:"Grace Lin",              category:"stories",     lang:"arabic",  emoji:"🏔️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2021",  file:"mountain-moon.pdf", cover:"" },
-      { id:28, title_ar:"أطفال السكة الحديدية",              title_en:"The Railway Children",                 author_ar:"إديث نسبيت",              author_en:"E. Nesbit",              category:"stories",     lang:"arabic",  emoji:"🚂", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019",  file:"railway-children.pdf", cover:"" },
-      { id:29, title_ar:"رابونزل وقصص أخرى",                title_en:"Rapunzel and Other Stories",           author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"stories",     lang:"arabic",  emoji:"👸", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020",  file:"rapunzel-stories.pdf", cover:"" },
-      { id:30, title_ar:"عشرون قصة من روائع شكسبير",        title_en:"Twenty Shakespeare Stories",           author_ar:"تشارلز ومارى لامب",       author_en:"Charles & Mary Lamb",    category:"stories",     lang:"arabic",  emoji:"🎭", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019",  file:"shakespeare-stories.pdf", cover:"" },
-      { id:31, title_ar:"الرياح وأشجار الصفصاف",            title_en:"The Wind in the Willows",              author_ar:"كينيث غراهام",            author_en:"Kenneth Grahame",        category:"stories",     lang:"arabic",  emoji:"🌳", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020",  file:"wind-willows.pdf", cover:"" },
-      { id:32, title_ar:"ألوان من قصص الأطفال في الأدب العالمي", title_en:"World Children's Stories",      author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"stories",     lang:"arabic",  emoji:"🌍", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020",  file:"world-children-stories.pdf", cover:"" },
+      { id:22, title_ar:"حكايات إيسوب",                     title_en:"Aesop's Fables",                       author_ar:"إيسوب",                   author_en:"Aesop",                  category:"stories",     lang:"english", emoji:"🦊", isbn:"",    publisher:"Planet eBook",   year:"620BC", file:"aesops-fables.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/aesops-fables.jpg" },
+      { id:23, title_ar:"مغامرات أليس في بلاد العجائب",     title_en:"Alice's Adventures in Wonderland",     author_ar:"لويس كارول",              author_en:"Lewis Carroll",          category:"stories",     lang:"english", emoji:"🐇", isbn:"",    publisher:"Planet eBook",   year:"1865",  file:"alices-adventures-in-wonderland.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/alices-adventures-in-wonderland.jpg" },
+      { id:24, title_ar:"حكايات هانس أندرسن الخيالية",      title_en:"Hans Andersen's Fairy Tales",          author_ar:"هانس كريستيان أندرسن",   author_en:"Hans Christian Andersen",category:"stories",     lang:"arabic",  emoji:"❄️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019",  file:"anderson-fairytales.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/anderson-fairytales.jpg" },
+      { id:25, title_ar:"قصص صينية للأطفال",                title_en:"Chinese Stories for Children",         author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"stories",     lang:"arabic",  emoji:"🐉", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020",  file:"chinese-stories.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/chinese-stories.jpg" },
+      { id:26, title_ar:"الفتاة التي شربت من ضوء القمر",    title_en:"The Girl Who Drank the Moon",          author_ar:"كيلي برنهيل",             author_en:"Kelly Barnhill",         category:"stories",     lang:"arabic",  emoji:"🌛", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2021",  file:"moonlight-girl.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/moonlight-girl.jpg" },
+      { id:27, title_ar:"حيث يلتقي الجبل والقمر",           title_en:"Where the Mountain Meets the Moon",    author_ar:"جريس لين",                author_en:"Grace Lin",              category:"stories",     lang:"arabic",  emoji:"🏔️", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2021",  file:"mountain-moon.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/mountain-moon.jpg" },
+      { id:28, title_ar:"أطفال السكة الحديدية",              title_en:"The Railway Children",                 author_ar:"إديث نسبيت",              author_en:"E. Nesbit",              category:"stories",     lang:"arabic",  emoji:"🚂", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019",  file:"railway-children.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/railway-children.jpg" },
+      { id:29, title_ar:"رابونزل وقصص أخرى",                title_en:"Rapunzel and Other Stories",           author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"stories",     lang:"arabic",  emoji:"👸", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020",  file:"rapunzel-stories.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/rapunzel-stories.jpg" },
+      { id:30, title_ar:"عشرون قصة من روائع شكسبير",        title_en:"Twenty Shakespeare Stories",           author_ar:"تشارلز ومارى لامب",       author_en:"Charles & Mary Lamb",    category:"stories",     lang:"arabic",  emoji:"🎭", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2019",  file:"shakespeare-stories.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/shakespeare-stories.jpg" },
+      { id:31, title_ar:"الرياح وأشجار الصفصاف",            title_en:"The Wind in the Willows",              author_ar:"كينيث غراهام",            author_en:"Kenneth Grahame",        category:"stories",     lang:"arabic",  emoji:"🌳", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020",  file:"wind-willows.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/wind-willows.jpg" },
+      { id:32, title_ar:"ألوان من قصص الأطفال في الأدب العالمي", title_en:"World Children's Stories",      author_ar:"مؤسسة هنداوي",           author_en:"Hindawi Foundation",     category:"stories",     lang:"arabic",  emoji:"🌍", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020",  file:"world-children-stories.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/world-children-stories.jpg" },
 
       // ── الصحة والبيئة ──
-      { id:33, title_ar:"دروس من النباتات",                  title_en:"Lessons from Plants",                  author_ar:"برِندا إل مونتجمري",      author_en:"Beronda Montgomery",     category:"health",      lang:"arabic",  emoji:"🌱", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2022", file:"lessons-from-plants.pdf", cover:"" },
-      { id:34, title_ar:"خُضرة: رحلات في وقت الربيع",       title_en:"Green: Spring Journeys",               author_ar:"تيم دي",                  author_en:"Tim Dee",                category:"health",      lang:"arabic",  emoji:"🐦", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2022", file:"green-spring-journeys.pdf", cover:"" },
+      { id:33, title_ar:"دروس من النباتات",                  title_en:"Lessons from Plants",                  author_ar:"برِندا إل مونتجمري",      author_en:"Beronda Montgomery",     category:"health",      lang:"arabic",  emoji:"🌱", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2022", file:"lessons-from-plants.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/lessons-from-plants.jpg" },
+      { id:34, title_ar:"خُضرة: رحلات في وقت الربيع",       title_en:"Green: Spring Journeys",               author_ar:"تيم دي",                  author_en:"Tim Dee",                category:"health",      lang:"arabic",  emoji:"🐦", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2022", file:"green-spring-journeys.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/green-spring-journeys.jpg" },
 
       // ── مهارات الحياة ──
-      { id:35, title_ar:"فن التفكير الواضح",                 title_en:"The Art of Clear Thinking",            author_ar:"رولف دوبلي",              author_en:"Rolf Dobelli",           category:"lifeskills",  lang:"arabic",  emoji:"🧠", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"clear-thinking.pdf", cover:"" },
-      { id:36, title_ar:"التحول الإيجابي",                   title_en:"Positive Mindset",                     author_ar:"كاثرين إيه ساندرسون",     author_en:"Catherine Sanderson",    category:"lifeskills",  lang:"arabic",  emoji:"🌟", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2022", file:"positive-mindset.pdf", cover:"" },
-      { id:37, title_ar:"الشخصية الناجعة",                   title_en:"The Effective Personality",            author_ar:"سلامة موسى",              author_en:"Salama Moussa",          category:"lifeskills",  lang:"arabic",  emoji:"💪", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2021", file:"strong-personality.pdf", cover:"" },
+      { id:35, title_ar:"فن التفكير الواضح",                 title_en:"The Art of Clear Thinking",            author_ar:"رولف دوبلي",              author_en:"Rolf Dobelli",           category:"lifeskills",  lang:"arabic",  emoji:"🧠", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2020", file:"clear-thinking.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/clear-thinking.jpg" },
+      { id:36, title_ar:"التحول الإيجابي",                   title_en:"Positive Mindset",                     author_ar:"كاثرين إيه ساندرسون",     author_en:"Catherine Sanderson",    category:"lifeskills",  lang:"arabic",  emoji:"🌟", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2022", file:"positive-mindset.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/positive-mindset.jpg" },
+      { id:37, title_ar:"الشخصية الناجعة",                   title_en:"The Effective Personality",            author_ar:"سلامة موسى",              author_en:"Salama Moussa",          category:"lifeskills",  lang:"arabic",  emoji:"💪", isbn:"",    publisher:"مؤسسة هنداوي",  year:"2021", file:"strong-personality.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/strong-personality.jpg" },
 
       // ── التقويم الأكاديمي ──
-      { id:38, title_ar:"التقويم الأكاديمي ٢٠٢٦–٢٠٢٧",     title_en:"Academic Calendar 2026-2027",          author_ar:"وزارة التربية والتعليم",  author_en:"Ministry of Education",  category:"calendar",    lang:"arabic",  emoji:"📅", isbn:"",    publisher:"وزارة التربية والتعليم", year:"2026", file:"School-Calendar-2026-2027.pdf", cover:"" },
+      { id:38, title_ar:"التقويم الأكاديمي ٢٠٢٦–٢٠٢٧",     title_en:"Academic Calendar 2026-2027",          author_ar:"وزارة التربية والتعليم",  author_en:"Ministry of Education",  category:"calendar",    lang:"arabic",  emoji:"📅", isbn:"",    publisher:"وزارة التربية والتعليم", year:"2026", file:"School-Calendar-2026-2027.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/School-Calendar-2026-2027.jpg" },
     ];
 
     const tagLabels = {
@@ -841,11 +835,12 @@
       document.getElementById('summerPageGrid').innerHTML = picks.map(b => {
         const title  = isEn ? b.title_en : b.title_ar;
         const author = isEn ? b.author_en : b.author_ar;
-                                        const imgId = `cover-${b.id}`;
-        const coverHtml = `<div class="book-cover ${b.lang==='english'?'lang-en':''}" style="position:relative;overflow:hidden;">
-          <span style="font-size:52px;position:relative;z-index:1;">${b.emoji}</span>
-          <img id="${imgId}" data-pdf="${b.file}" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" alt="">
-        </div>`;
+                                                const coverHtml = b.cover
+          ? `<div class="book-cover ${b.lang==='english'?'lang-en':''}" style="padding:0;font-size:0;">
+               <img src="${b.cover}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"
+                 onerror="this.parentElement.style.fontSize='52px';this.parentElement.style.display='flex';this.parentElement.style.alignItems='center';this.parentElement.style.justifyContent='center';this.parentElement.innerHTML='${b.emoji}'">
+             </div>`
+          : `<div class="book-cover ${b.lang==='english'?'lang-en':''}">${b.emoji}</div>`;
         return `<div class="book-card" onclick="openBook(${b.id});closeSummerPage()">
           ${coverHtml}
           <div class="book-info">
@@ -914,7 +909,6 @@
         b.classList.toggle('active', b.dataset.cat === cat);
       });
       renderBooks();
-      setTimeout(renderCoversForVisible, 400);
     }
 
     function filterBy(btn) {
@@ -927,31 +921,6 @@
     // ────────────────────────────────────────────
     // RENDER BOOKS
     // ────────────────────────────────────────────
-    async function renderPDFCover(imgId, pdfUrl) {
-      if (typeof pdfjsLib === 'undefined') return;
-      try {
-        const rawUrl = 'https://raw.githubusercontent.com/Aradbadea/arad-library/main/' + pdfUrl;
-        const pdf = await pdfjsLib.getDocument(rawUrl).promise;
-        const page = await pdf.getPage(1);
-        const viewport = page.getViewport({ scale: 1.5 });
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-        const img = document.getElementById(imgId);
-        if (!img) return;
-        img.src = canvas.toDataURL();
-        img.style.display = 'block';
-        img.previousElementSibling && (img.previousElementSibling.style.display = 'none');
-      } catch(e) { /* keep emoji fallback */ }
-    }
-
-    function renderCoversForVisible() {
-      document.querySelectorAll('img[data-pdf]').forEach(img => {
-        if (!img.dataset.loaded) {
-          img.dataset.loaded = '1';
-          renderPDFCover(img.id, img.dataset.pdf);
-        }
       });
     }
 
@@ -1107,8 +1076,6 @@
     // ── INIT ──
     initSummer();
     renderBooks();
-    // Render PDF covers after cards are in DOM
-    setTimeout(renderCoversForVisible, 400);
   </script>
 
   <!-- ── SUMMER PAGE ── -->
