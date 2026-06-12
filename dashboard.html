@@ -173,7 +173,16 @@
     <div>
       <span style="font-size:12px;color:var(--muted);font-weight:600;">لوحة تحكم المكتبة — مدرسة عراد الإعدادية للبنات</span>
     </div>
-    <button class="refresh-btn" onclick="loadData()">🔄 تحديث</button>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <select id="periodFilter" onchange="loadData()" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:white;cursor:pointer;">
+        <option value="all">كل الوقت</option>
+        <option value="today">اليوم</option>
+        <option value="week">هذا الأسبوع</option>
+        <option value="month">هذا الشهر</option>
+      </select>
+      <button class="refresh-btn" onclick="loadData()">🔄 تحديث</button>
+      <button class="refresh-btn" onclick="exportPDF()" style="background:#C8A951;border-color:#C8A951;">📄 حفظ PDF</button>
+    </div>
   </header>
 
   <!-- DASHBOARD -->
@@ -289,8 +298,23 @@
     async function loadData() {
       document.getElementById('statLastUpdate').textContent = fmt(new Date().toISOString());
 
+      const period = document.getElementById('periodFilter')?.value || 'all';
+      let fromDate = null;
+      const now = new Date();
+      if (period === 'today') {
+        fromDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+      } else if (period === 'week') {
+        const d = new Date(now); d.setDate(d.getDate() - 7);
+        fromDate = d.toISOString();
+      } else if (period === 'month') {
+        const d = new Date(now); d.setMonth(d.getMonth() - 1);
+        fromDate = d.toISOString();
+      }
+
       // Sessions
-      const { data: sessions } = await sb.from('sessions').select('*').order('entered_at', { ascending: false }).limit(50);
+      let sessQuery = sb.from('sessions').select('*').order('entered_at', { ascending: false }).limit(200);
+      if (fromDate) sessQuery = sessQuery.gte('entered_at', fromDate);
+      const { data: sessions } = await sessQuery;
       const sessBody = document.getElementById('sessionsBody');
       if (sessions && sessions.length) {
         const unique = [...new Set(sessions.map(s => s.student_name))];
@@ -307,7 +331,9 @@
       }
 
       // Reads
-      const { data: reads } = await sb.from('reads').select('*').order('read_at', { ascending: false });
+      let readsQuery = sb.from('reads').select('*').order('read_at', { ascending: false });
+      if (fromDate) readsQuery = readsQuery.gte('read_at', fromDate);
+      const { data: reads } = await readsQuery;
       const readsBody = document.getElementById('readsBody');
       document.getElementById('readsCount').textContent = reads?.length || 0;
       document.getElementById('statReads').textContent  = reads?.length || 0;
@@ -343,6 +369,57 @@
         readsBody.innerHTML = '<tr><td colspan="3" class="empty-panel">لا توجد قراءات بعد</td></tr>';
         document.getElementById('popularBooks').innerHTML = '<div class="empty-panel">لا توجد بيانات بعد</div>';
       }
+    }
+
+    function exportPDF() {
+      const period = document.getElementById('periodFilter')?.value || 'all';
+      const periodLabels = { all:'كل الوقت', today:'اليوم', week:'هذا الأسبوع', month:'هذا الشهر' };
+      const label = periodLabels[period] || '';
+      const title = `تقرير مكتبة مدرسة عراد الإعدادية للبنات — ${label}`;
+
+      const printWin = window.open('', '_blank');
+      printWin.document.write(`<!DOCTYPE html><html dir="rtl"><head>
+        <meta charset="UTF-8">
+        <title>${title}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+        <style>
+          body { font-family: Tajawal, sans-serif; padding: 32px; color: #1A1D2E; direction: rtl; }
+          h1 { font-size: 20px; margin-bottom: 4px; }
+          .sub { color: #888; font-size: 13px; margin-bottom: 24px; }
+          .stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+          .stat { background: #F0F4FF; border-radius: 10px; padding: 14px 20px; min-width: 140px; }
+          .stat-label { font-size: 12px; color: #666; }
+          .stat-value { font-size: 24px; font-weight: 900; color: #1B4FBC; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 13px; }
+          th { background: #1B4FBC; color: white; padding: 8px 10px; text-align: right; }
+          td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+          tr:nth-child(even) td { background: #F8F9FF; }
+          h2 { font-size: 15px; margin: 20px 0 10px; color: #1B4FBC; }
+          @media print { body { padding: 16px; } }
+        </style>
+      </head><body>
+        <h1>📚 ${title}</h1>
+        <div class="sub">تاريخ التقرير: ${new Date().toLocaleDateString('ar-BH', {year:'numeric',month:'long',day:'numeric'})}</div>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">طالبات دخلن</div><div class="stat-value">${document.getElementById('statStudents').textContent}</div></div>
+          <div class="stat"><div class="stat-label">إجمالي فتح الكتب</div><div class="stat-value">${document.getElementById('statReads').textContent}</div></div>
+          <div class="stat"><div class="stat-label">الكتاب الأكثر قراءة</div><div class="stat-value" style="font-size:14px;padding-top:4px;">${document.getElementById('statTopBook').textContent}</div></div>
+        </div>
+        <h2>الكتب الأكثر قراءة</h2>
+        ${document.getElementById('popularBooks').innerHTML}
+        <h2>سجل القراءات</h2>
+        <table>
+          <thead><tr><th>الطالبة</th><th>الكتاب</th><th>التاريخ</th></tr></thead>
+          <tbody>${document.getElementById('readsBody').innerHTML}</tbody>
+        </table>
+        <h2>سجل الدخولات</h2>
+        <table>
+          <thead><tr><th>الطالبة</th><th>التاريخ</th></tr></thead>
+          <tbody>${document.getElementById('sessionsBody').innerHTML}</tbody>
+        </table>
+      </body></html>`);
+      printWin.document.close();
+      setTimeout(() => { printWin.print(); }, 800);
     }
   </script>
 </body>
