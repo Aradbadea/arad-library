@@ -255,7 +255,7 @@
     }
 
     /* ── GRID ── */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+    .grid { display: block; width: 100%; }
     .book-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -402,7 +402,7 @@
       padding: 12px 20px;
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; gap: 14px;
-      flex-shrink: 0; overflow-y: auto; max-height: 140px;
+      flex-shrink: 0;
     }
     .modal-cover {
       width: 68px; height: 92px; border-radius: 8px;
@@ -986,7 +986,7 @@
         return;
       }
 
-      grid.innerHTML = filtered.map(b => {
+      const cards = filtered.map(b => {
         const title   = isEn ? b.title_en : b.title_ar;
         const author  = isEn ? b.author_en : b.author_ar;
         const tag     = tagLabels[b.category]?.[currentLang] || '';
@@ -1014,6 +1014,7 @@
             </div>
           </div>`;
       }).join('');
+      grid.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;">${cards}</div>`;
     }
 
     // ────────────────────────────────────────────
