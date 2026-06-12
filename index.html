@@ -573,6 +573,7 @@
     <button class="filter-btn"        data-cat="manahil"     data-ar="مناهل الزاد"         data-en="Manahil Al-Zad"   onclick="filterBy(this)">مناهل الزاد</button>
     <button class="filter-btn"        data-cat="special"     data-ar="دعم الفئات"          data-en="Special Support"  onclick="filterBy(this)">دعم الفئات</button>
     <button class="filter-btn"        data-cat="arabic_reading" data-ar="تحدي القراءة العربي"  data-en="Arab Reading Challenge" onclick="filterBy(this)">تحدي القراءة العربي</button>
+    <button class="filter-btn" data-cat="summer" data-ar="صيفنا قراءة ☀️" data-en="Summer Reads ☀️" onclick="filterBy(this)" id="summerFilterBtn" style="display:none;background:linear-gradient(135deg,#F9A825,#FF6F00);color:white;border-color:transparent;">صيفنا قراءة ☀️</button>
 
   </div>
 
@@ -862,7 +863,7 @@
       const catEmojis = {
         citizenship:'🇧🇭', heritage:'📜', languages:'🌐', islamic:'☪️',
         general:'🔬', stories:'📖', health:'💚', lifeskills:'🎯',
-        calendar:'📅', manahil:'🌿', special:'🤝'
+        calendar:'📅', manahil:'🌿', special:'🤝', arabic_reading:'📗'
       };
       let catHtml = '';
       catOrder.forEach(cat => {
@@ -884,6 +885,23 @@
             <div style="font-size:12px;color:var(--muted);background:var(--accent-light);padding:3px 10px;border-radius:10px;">${catBooks.length} ${isEn ? 'books' : 'كتاب'}</div>
           </div>`;
       });
+      // Summer tile — only in summer months
+      if (isSummer()) {
+        catHtml += `
+          <div onclick="openSummerPage()" style="
+            background:linear-gradient(135deg,#F9A825,#FF6F00); border:2px solid transparent; border-radius:16px;
+            padding:28px 20px; text-align:center; cursor:pointer;
+            transition:all 0.2s; display:flex; flex-direction:column;
+            align-items:center; gap:10px; color:white;
+            box-shadow:0 2px 8px rgba(249,168,37,0.3);
+          " onmouseover="this.style.transform='translateY(-4px)'"
+             onmouseout="this.style.transform=''">
+            <div style="font-size:40px;">☀️</div>
+            <div style="font-size:16px;font-weight:800;">صيفنا قراءة</div>
+            <div style="font-size:12px;opacity:0.9;background:rgba(255,255,255,0.2);padding:3px 10px;border-radius:10px;">كتب الصيف</div>
+          </div>`;
+      }
+
       // All books tile
       catHtml += `
         <div onclick="filterByCategory('all')" style="
@@ -925,6 +943,9 @@
       const isEn  = currentLang === 'en';
       const query = document.getElementById('searchInput').value.toLowerCase();
       const grid  = document.getElementById('bookGrid');
+      // Show/hide summer banner only on homepage
+      const summerSec = document.getElementById('summerSection');
+      if (summerSec) summerSec.style.display = (currentFilter === 'all' && !query && isSummer()) ? 'block' : 'none';
       // If on homepage (all, no search) show category blocks
       if (currentFilter === 'all' && !query) {
         renderCategoryBlocks(isEn, grid);
