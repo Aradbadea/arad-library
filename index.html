@@ -862,7 +862,6 @@
       let catHtml = '';
       catOrder.forEach(cat => {
         const catBooks = books.filter(b => b.category === cat);
-        if (!catBooks.length) return;
         const label = tagLabels[cat]?.[isEn ? 'en' : 'ar'] || cat;
         const emoji = catEmojis[cat] || '📚';
         catHtml += `
