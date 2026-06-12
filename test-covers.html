@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cover Test</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+</head>
+<body style="padding:20px;font-family:sans-serif;">
+<h2>PDF Cover Test</h2>
+<div id="status">Loading...</div>
+<canvas id="c" style="border:2px solid blue;display:block;margin-top:16px;max-width:200px;"></canvas>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.worker.min.js';
+pdfjsLib.getDocument('https://raw.githubusercontent.com/Aradbadea/arad-library/main/kalila-dimna.pdf').promise
+.then(p => { document.getElementById('status').innerHTML = '✅ PDF loaded: ' + p.numPages + ' pages'; return p.getPage(1); })
+.then(page => {
+  const vp = page.getViewport({scale:0.5});
+  const c = document.getElementById('c');
+  c.width = vp.width; c.height = vp.height;
+  return page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+})
+.then(() => { document.getElementById('status').innerHTML += '<br>✅ Cover rendered!'; })
+.catch(e => { document.getElementById('status').innerHTML = '❌ ' + e.message; });
+</script>
+</body>
+</html>
