@@ -174,12 +174,19 @@
       <span style="font-size:12px;color:var(--muted);font-weight:600;">لوحة تحكم المكتبة — مدرسة عراد الإعدادية للبنات</span>
     </div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <select id="periodFilter" onchange="loadData()" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:white;cursor:pointer;">
+      <select id="periodFilter" onchange="handlePeriodChange()" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;background:white;cursor:pointer;">
         <option value="all">كل الوقت</option>
         <option value="today">اليوم</option>
         <option value="week">هذا الأسبوع</option>
         <option value="month">هذا الشهر</option>
+        <option value="custom">نطاق مخصص</option>
       </select>
+      <div id="customRange" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;">
+        <input type="date" id="dateFrom" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;" />
+        <span style="color:var(--muted);">—</span>
+        <input type="date" id="dateTo" style="padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:13px;" />
+        <button onclick="loadData()" style="padding:7px 14px;background:var(--accent);color:white;border:none;border-radius:8px;font-family:inherit;cursor:pointer;">عرض</button>
+      </div>
       <button class="refresh-btn" onclick="loadData()">🔄 تحديث</button>
       <button class="refresh-btn" onclick="exportPDF()" style="background:#C8A951;border-color:#C8A951;">📄 حفظ PDF</button>
     </div>
@@ -295,11 +302,19 @@
         + ' ' + d.toLocaleTimeString('ar-BH', { hour:'2-digit', minute:'2-digit' });
     }
 
+    function handlePeriodChange() {
+      const period = document.getElementById('periodFilter').value;
+      const customRange = document.getElementById('customRange');
+      customRange.style.display = period === 'custom' ? 'flex' : 'none';
+      if (period !== 'custom') loadData();
+    }
+
     async function loadData() {
       document.getElementById('statLastUpdate').textContent = fmt(new Date().toISOString());
 
       const period = document.getElementById('periodFilter')?.value || 'all';
       let fromDate = null;
+      let toDate = null;
       const now = new Date();
       if (period === 'today') {
         fromDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
@@ -309,11 +324,17 @@
       } else if (period === 'month') {
         const d = new Date(now); d.setMonth(d.getMonth() - 1);
         fromDate = d.toISOString();
+      } else if (period === 'custom') {
+        const f = document.getElementById('dateFrom').value;
+        const t = document.getElementById('dateTo').value;
+        if (f) fromDate = new Date(f).toISOString();
+        if (t) { const td = new Date(t); td.setHours(23,59,59); toDate = td.toISOString(); }
       }
 
       // Sessions
       let sessQuery = sb.from('sessions').select('*').order('entered_at', { ascending: false }).limit(200);
       if (fromDate) sessQuery = sessQuery.gte('entered_at', fromDate);
+      if (toDate) sessQuery = sessQuery.lte('entered_at', toDate);
       const { data: sessions } = await sessQuery;
       const sessBody = document.getElementById('sessionsBody');
       if (sessions && sessions.length) {
@@ -333,6 +354,7 @@
       // Reads
       let readsQuery = sb.from('reads').select('*').order('read_at', { ascending: false });
       if (fromDate) readsQuery = readsQuery.gte('read_at', fromDate);
+      if (toDate) readsQuery = readsQuery.lte('read_at', toDate);
       const { data: reads } = await readsQuery;
       const readsBody = document.getElementById('readsBody');
       document.getElementById('readsCount').textContent = reads?.length || 0;
@@ -412,11 +434,7 @@
           <thead><tr><th>الطالبة</th><th>الكتاب</th><th>التاريخ</th></tr></thead>
           <tbody>${document.getElementById('readsBody').innerHTML}</tbody>
         </table>
-        <h2>سجل الدخولات</h2>
-        <table>
-          <thead><tr><th>الطالبة</th><th>التاريخ</th></tr></thead>
-          <tbody>${document.getElementById('sessionsBody').innerHTML}</tbody>
-        </table>
+
       </body></html>`);
       printWin.document.close();
       setTimeout(() => { printWin.print(); }, 800);
