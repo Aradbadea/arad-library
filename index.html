@@ -291,6 +291,10 @@
       background: var(--accent-light);
       display: flex; align-items: center; justify-content: center;
       font-size: 52px; color: var(--accent);
+      overflow: hidden;
+    }
+    .book-cover img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
     }
     .book-cover.lang-en { background: #FFF8E6; }
     .book-info { padding: 12px 12px 14px; }
@@ -465,6 +469,55 @@
       .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
       .header-school-sub { display: none; }
     }
+
+    /* ── Summer Page ── */
+    #summerPage {
+      display: none;
+      position: fixed; inset: 0; z-index: 500;
+      background: linear-gradient(160deg, #FFF8E1 0%, #FFF3CD 100%);
+      overflow-y: auto; padding: 0;
+    }
+    #summerPage.open { display: block; }
+    .summer-page-header {
+      background: linear-gradient(135deg, #F9A825, #FF6F00);
+      padding: 28px 24px 24px;
+      text-align: center; color: white;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .summer-page-header h2 { font-size: 26px; margin: 0 0 4px; }
+    .summer-page-header p  { font-size: 13px; margin: 0; opacity: 0.9; }
+    .summer-page-close {
+      position: absolute; top: 16px; left: 16px;
+      background: rgba(255,255,255,0.25); border: none;
+      color: white; font-size: 20px; width: 36px; height: 36px;
+      border-radius: 50%; cursor: pointer;
+    }
+    .summer-books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px; padding: 24px;
+    }
+
+    /* ── Category Blocks ── */
+    .cat-block {
+      grid-column: 1 / -1;
+      margin-bottom: 8px;
+    }
+    .cat-block-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 4px; border-bottom: 2px solid var(--accent-light);
+      margin-bottom: 14px;
+    }
+    .cat-block-title { font-size: 17px; font-weight: 800; color: var(--accent); }
+    .cat-block-see-all {
+      font-size: 12px; color: var(--accent); cursor: pointer;
+      text-decoration: underline; background: none; border: none;
+    }
+    .cat-block-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+    }
   </style>
 </head>
 <body>
@@ -531,6 +584,7 @@
     <button class="filter-btn"        data-cat="lifeskills"  data-ar="مهارات الحياة"       data-en="Life Skills"      onclick="filterBy(this)">مهارات الحياة</button>
     <button class="filter-btn"        data-cat="calendar"    data-ar="التقويم الأكاديمي"   data-en="Academic Calendar" onclick="filterBy(this)">التقويم</button>
     <button class="filter-btn"        data-cat="manahil"     data-ar="مناهل الزاد"         data-en="Manahil Al-Zad"   onclick="filterBy(this)">مناهل الزاد</button>
+    <button class="filter-btn"        data-cat="special"     data-ar="دعم الفئات"          data-en="Special Support"  onclick="filterBy(this)">دعم الفئات</button>
 
   </div>
 
@@ -539,7 +593,7 @@
 
     <!-- SUMMER READS SECTION (auto-shown June–Aug) -->
     <div class="summer-section" id="summerSection" style="display:none;">
-      <div class="summer-banner" onclick="filterBySummer()" style="cursor:pointer;" title="اضغطي لعرض كتب الصيف">
+      <div class="summer-banner" onclick="openSummerPage()" style="cursor:pointer;" title="اضغطي لعرض كتب الصيف">
         <div class="summer-banner-eyebrow" id="summerEyebrow">✨ اختيار خاص</div>
         <h2 id="summerTitle">صيفنا قراءة 🌞</h2>
         <p id="summerDesc">كتب مختارة بعناية لتُرافقك في إجازتك — خفيفة، ممتعة، ومفيدة</p>
@@ -686,6 +740,7 @@
       lifeskills:  { ar: "مهارات الحياة",           en: "Life Skills"      },
       calendar:    { ar: "التقويم الأكاديمي",       en: "Academic Calendar"},
       manahil:     { ar: "مناهل الزاد",              en: "Manahil Al-Zad"   },
+      special:     { ar: "دعم الفئات",               en: "Special Support"  },
       summer:      { ar: "صيفنا قراءة",       en: "Summer Reads"    },
     };
 
@@ -788,11 +843,80 @@
     // ────────────────────────────────────────────
     // FILTER
     // ────────────────────────────────────────────
-    function filterBySummer() {
-      currentFilter = 'summer';
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    function openSummerPage() {
+      const isEn = currentLang === 'en';
+      const picks = SUMMER_IDS.map(id => books.find(b => b.id === id)).filter(Boolean);
+      document.getElementById('summerPageGrid').innerHTML = picks.map(b => {
+        const title  = isEn ? b.title_en : b.title_ar;
+        const author = isEn ? b.author_en : b.author_ar;
+        const coverHtml = b.cover
+          ? `<div class="book-cover"><img src="${b.cover}" alt="${title}" onerror="this.parentElement.innerHTML='<span style=font-size:52px>${b.emoji}</span>'"></div>`
+          : `<div class="book-cover">${b.emoji}</div>`;
+        return `<div class="book-card" onclick="openBook(${b.id});closeSummerPage()">
+          ${coverHtml}
+          <div class="book-info">
+            <div class="book-title">${title}</div>
+            <div class="book-author">${author}</div>
+          </div>
+        </div>`;
+      }).join('');
+      document.getElementById('summerPage').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSummerPage() {
+      document.getElementById('summerPage').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function renderCategoryBlocks(isEn, grid) {
+      const catOrder = ['citizenship','heritage','languages','islamic','general','stories','health','lifeskills','calendar','manahil','special'];
+      let html = '';
+      catOrder.forEach(cat => {
+        const catBooks = books.filter(b => b.category === cat);
+        if (!catBooks.length) return;
+        const label = tagLabels[cat]?.[isEn ? 'en' : 'ar'] || cat;
+        const preview = catBooks.slice(0, 5);
+        html += `<div class="cat-block">
+          <div class="cat-block-header">
+            <span class="cat-block-title">${label}</span>
+            <button class="cat-block-see-all" onclick="filterByCategory('${cat}')">${isEn ? 'See all' : 'عرض الكل'} (${catBooks.length})</button>
+          </div>
+          <div class="cat-block-grid">
+            ${preview.map(b => {
+              const title = isEn ? b.title_en : b.title_ar;
+              const coverHtml = b.cover
+                ? `<div class="book-cover"><img src="${b.cover}" alt="${title}" onerror="this.parentElement.innerHTML='<span style=font-size:52px>${b.emoji}</span>'"></div>`
+                : `<div class="book-cover">${b.emoji}</div>`;
+              return `<div class="book-card" onclick="openBook(${b.id})">${coverHtml}<div class="book-info"><div class="book-title">${title}</div></div></div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      });
+      // All books block
+      html += `<div class="cat-block">
+        <div class="cat-block-header">
+          <span class="cat-block-title">${isEn ? 'All Books' : 'جميع الكتب'}</span>
+          <button class="cat-block-see-all" onclick="filterByCategory('all')">${isEn ? 'Browse all' : 'تصفح الكل'} (${books.length})</button>
+        </div>
+        <div class="cat-block-grid">
+          ${books.slice(0,10).map(b => {
+            const title = isEn ? b.title_en : b.title_ar;
+            const coverHtml = b.cover
+              ? `<div class="book-cover"><img src="${b.cover}" alt="${title}" onerror="this.parentElement.innerHTML='<span style=font-size:52px>${b.emoji}</span>'"></div>`
+              : `<div class="book-cover">${b.emoji}</div>`;
+            return `<div class="book-card" onclick="openBook(${b.id})">${coverHtml}<div class="book-info"><div class="book-title">${title}</div></div></div>`;
+          }).join('')}
+        </div>
+      </div>`;
+      grid.innerHTML = html;
+    }
+
+    function filterByCategory(cat) {
+      currentFilter = cat;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.cat === cat);
+      });
       renderBooks();
-      document.querySelector('.section-divider, .summer-divider')?.scrollIntoView({behavior:'smooth'});
     }
 
     function filterBy(btn) {
@@ -809,6 +933,11 @@
       const isEn  = currentLang === 'en';
       const query = document.getElementById('searchInput').value.toLowerCase();
       const grid  = document.getElementById('bookGrid');
+      // If on homepage (all, no search) show category blocks
+      if (currentFilter === 'all' && !query) {
+        renderCategoryBlocks(isEn, grid);
+        return;
+      }
 
       let filtered = books.filter(b => {
         const isSummerFilter = currentFilter === 'summer';
@@ -841,9 +970,7 @@
         const reads   = readCounts[b.id] || 0;
         const popular = reads >= 5 ? `<span style="color:var(--accent-2);font-weight:700;">★</span> ` : '';
         const coverHtml = b.cover
-          ? `<div class="book-cover ${b.lang === 'english' ? 'lang-en' : ''}" style="padding:0;background:#f0f0f0;position:relative;">
-              <img src="${b.cover}" alt="${title}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;" onerror="this.parentElement.innerHTML='${b.emoji}'">
-             </div>`
+          ? `<div class="book-cover ${b.lang === 'english' ? 'lang-en' : ''}"><img src="${b.cover}" alt="${title}" onerror="this.parentElement.innerHTML='<span style=font-size:52px>${b.emoji}</span>'"></div>`
           : `<div class="book-cover ${b.lang === 'english' ? 'lang-en' : ''}">${b.emoji}</div>`;
         return `
           <div class="book-card" onclick="openBook(${b.id})">
@@ -948,5 +1075,16 @@
     initSummer();
     renderBooks();
   </script>
+
+  <!-- ── SUMMER PAGE ── -->
+  <div id="summerPage">
+    <div class="summer-page-header">
+      <button class="summer-page-close" onclick="closeSummerPage()">✕</button>
+      <h2>☀️ صيفنا قراءة</h2>
+      <p>كتب مختارة بعناية لتُرافقك في إجازتك — خفيفة، ممتعة، ومفيدة</p>
+    </div>
+    <div class="summer-books-grid" id="summerPageGrid"></div>
+  </div>
+
 </body>
 </html>
