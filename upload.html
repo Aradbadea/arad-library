@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رفع ملف مناهجي — مكتبة عراد الإعدادية للبنات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent:   #1B4FBC;
+    --accent-2: #C8A951;
+    --bg:       #F5F6FA;
+    --surface:  #FFFFFF;
+    --text:     #1a1a2e;
+    --muted:    #6b7280;
+    --border:   #e5e7eb;
+    --danger:   #dc2626;
+    --success:  #16a34a;
+    --shadow:   0 2px 12px rgba(27,79,188,.10);
+    --radius:   14px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--accent);
+    color: #fff;
+    direction: ltr;
+    padding: 0 24px;
+  }
+  .header-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    gap: 12px;
+  }
+  .logo-block { display: flex; align-items: center; gap: 14px; }
+  .logo-block .names { direction: rtl; }
+  .logo-block .name-ar { font-size: 1rem; font-weight: 700; line-height: 1.3; }
+  .logo-block .name-en { font-size: .72rem; opacity: .78; font-family: 'Lato', sans-serif; }
+  .header-nav a {
+    color: rgba(255,255,255,.85);
+    text-decoration: none;
+    font-size: .9rem;
+    padding: 6px 14px;
+    border-radius: 8px;
+    direction: rtl;
+    display: inline-block;
+    transition: background .2s;
+  }
+  .header-nav a:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+  /* ── Page hero ── */
+  .page-hero {
+    background: linear-gradient(135deg, var(--accent-2) 0%, #e0b850 100%);
+    color: #fff;
+    text-align: center;
+    padding: 40px 24px 32px;
+  }
+  .page-hero .hero-icon { font-size: 2.8rem; margin-bottom: 10px; }
+  .page-hero h1 { font-size: 1.7rem; font-weight: 800; margin-bottom: 6px; }
+  .page-hero p { font-size: .95rem; opacity: .9; }
+
+  /* ── Form card ── */
+  main {
+    flex: 1;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 36px 20px 60px;
+    width: 100%;
+  }
+  .form-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 36px;
+  }
+
+  /* ── Form elements ── */
+  .form-group { margin-bottom: 22px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  label {
+    display: block;
+    font-size: .9rem;
+    font-weight: 700;
+    margin-bottom: 7px;
+    color: var(--text);
+  }
+  label .req { color: var(--danger); margin-right: 2px; }
+  input[type=text],
+  select,
+  textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: .97rem;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    direction: rtl;
+  }
+  input[type=text]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(27,79,188,.12);
+    background: #fff;
+  }
+  textarea { min-height: 90px; resize: vertical; }
+
+  /* ── File drop zone ── */
+  .drop-zone {
+    border: 2.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    background: var(--bg);
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: #eef2fc;
+  }
+  .drop-zone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .drop-zone .dz-icon { font-size: 2.8rem; margin-bottom: 10px; }
+  .drop-zone .dz-text { font-size: 1rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .drop-zone .dz-hint { font-size: .82rem; color: var(--muted); }
+  .file-chosen {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #eef2fc;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .file-chosen .fc-icon { font-size: 1.4rem; }
+  .file-chosen .fc-remove {
+    margin-right: auto;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: .85rem;
+    font-weight: 700;
+  }
+
+  /* ── Upload progress ── */
+  .progress-wrap {
+    display: none;
+    margin-top: 16px;
+  }
+  .progress-wrap.active { display: block; }
+  .progress-bar-bg {
+    height: 8px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #4c7eff);
+    border-radius: 10px;
+    width: 0%;
+    transition: width .3s;
+  }
+  .progress-text { font-size: .83rem; color: var(--muted); text-align: center; }
+
+  /* ── Submit button ── */
+  .btn-submit {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .btn-submit:hover:not(:disabled) { background: #163fa0; transform: scale(1.01); }
+  .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  /* ── Success / Error alerts ── */
+  .alert {
+    display: none;
+    padding: 18px 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-size: .97rem;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  .alert.show { display: block; }
+  .alert-success {
+    background: #dcfce7;
+    border: 1.5px solid #86efac;
+    color: #166534;
+  }
+  .alert-error {
+    background: #fee2e2;
+    border: 1.5px solid #fca5a5;
+    color: #991b1b;
+  }
+  .alert-success .alert-icon,
+  .alert-error .alert-icon { font-size: 1.4rem; margin-left: 8px; }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1.5px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--text);
+    color: rgba(255,255,255,.7);
+    text-align: center;
+    padding: 22px 20px;
+    font-size: .82rem;
+    line-height: 1.8;
+  }
+  footer span { color: var(--accent-2); font-weight: 600; }
+
+  @media (max-width: 560px) {
+    .form-row { grid-template-columns: 1fr; }
+    .form-card { padding: 22px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ Header ══ -->
+<header>
+  <div class="header-inner">
+    <div class="logo-block">
+      <div class="names">
+        <div class="name-ar">مركز مصادر التعلم</div>
+        <div class="name-en">Arad Intermediate Girls' School</div>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <a href="manahil.html">← العودة لمناهل الزاد</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ══ Hero ══ -->
+<div class="page-hero">
+  <div class="hero-icon">📤</div>
+  <h1>رفع ملف مناهجي</h1>
+  <p>أضيفي ملف PDF للمناهج الدراسية لتستفيد منه طالباتك</p>
+</div>
+
+<!-- ══ Main ══ -->
+<main>
+  <!-- Alerts -->
+  <div class="alert alert-success" id="alertSuccess">
+    <span class="alert-icon">✅</span>
+    تم رفع الملف بنجاح! سيظهر في صفحة مناهل الزاد خلال لحظات.<br>
+    <a href="manahil.html" style="color:#166534;font-weight:700;text-decoration:underline">العودة إلى مناهل الزاد ←</a>
+  </div>
+  <div class="alert alert-error" id="alertError">
+    <span class="alert-icon">⚠️</span>
+    <span id="errorMsg">حدث خطأ أثناء الرفع. يرجى المحاولة مجدداً.</span>
+  </div>
+
+  <div class="form-card">
+    <form id="uploadForm" novalidate>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label>عنوان الملف <span class="req">*</span></label>
+        <input type="text" id="fTitle" placeholder="مثال: مراجعة الفصل الأول — الرياضيات" required maxlength="200">
+      </div>
+
+      <!-- Author -->
+      <div class="form-group">
+        <label>اسم المعلمة / المُعِدّة</label>
+        <input type="text" id="fAuthor" placeholder="اختياري — مثال: أ. فاطمة المدني" maxlength="100">
+      </div>
+
+      <!-- Grade + Subject -->
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label>الصف الدراسي <span class="req">*</span></label>
+          <select id="fGrade" required>
+            <option value="">— اختاري الصف —</option>
+            <option value="grade1">الصف الأول الإعدادي</option>
+            <option value="grade2">الصف الثاني الإعدادي</option>
+            <option value="grade3">الصف الثالث الإعدادي</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>المادة الدراسية <span class="req">*</span></label>
+          <select id="fSubject" required>
+            <option value="">— اختاري المادة —</option>
+            <option value="arabic">اللغة العربية</option>
+            <option value="english">اللغة الإنجليزية</option>
+            <option value="french">اللغة الفرنسية</option>
+            <option value="math">الرياضيات</option>
+            <option value="science">العلوم</option>
+            <option value="social">الدراسات الاجتماعية</option>
+            <option value="islamic">التربية الإسلامية</option>
+            <option value="citizenship">التربية الوطنية</option>
+          </select>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- PDF file -->
+      <div class="form-group">
+        <label>ملف PDF <span class="req">*</span></label>
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fFile" accept=".pdf,application/pdf" required>
+          <div class="dz-icon">📄</div>
+          <div class="dz-text">اسحبي الملف هنا أو انقري للاختيار</div>
+          <div class="dz-hint">ملفات PDF فقط · الحجم الأقصى 50 MB</div>
+        </div>
+        <div class="file-chosen" id="fileChosen" style="display:none">
+          <span class="fc-icon">📄</span>
+          <span id="fileChosenName"></span>
+          <span id="fileChosenSize" style="color:var(--muted);font-size:.82rem"></span>
+          <span class="fc-remove" id="removeFile" title="إزالة">✕</span>
+        </div>
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+          <div class="progress-text" id="progressText">جاري الرفع…</div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label>ملاحظات (اختياري)</label>
+        <textarea id="fNotes" placeholder="مثال: يغطي الوحدات 1–3، مراجعة للاختبار النهائي…" maxlength="500"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span id="submitIcon">📤</span>
+        <span id="submitLabel">رفع الملف</span>
+      </button>
+    </form>
+  </div>
+</main>
+
+<!-- ══ Footer ══ -->
+<footer>
+  مركز مصادر التعلم - مدرسة عراد الإعدادية للبنات 2026 © <br>
+  إعداد: <span>أ. بديعة حمدين</span> | إشراف مديرة المدرسة: <span>أ. موزة الكبيسي</span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL  = 'https://tjdznavmbudvjngdekqr.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqZHpuYXZtYnVkdmpuZ2Rla3FyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDQ1ODIsImV4cCI6MjA5Njc4MDU4Mn0.WI9KndkDyCk8IuxqcacNkui-9tCXFy3XR-z8Tast2tM';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+const MAX_SIZE = 50 * 1024 * 1024; // 50 MB
+
+let selectedFile = null;
+
+function formatSize(bytes) {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+  return (bytes / (1024*1024)).toFixed(1) + ' MB';
+}
+
+function showFile(file) {
+  selectedFile = file;
+  document.getElementById('fileChosen').style.display = 'flex';
+  document.getElementById('fileChosenName').textContent = file.name;
+  document.getElementById('fileChosenSize').textContent = formatSize(file.size);
+  document.getElementById('dropZone').style.display = 'none';
+}
+
+function clearFile() {
+  selectedFile = null;
+  document.getElementById('fFile').value = '';
+  document.getElementById('fileChosen').style.display = 'none';
+  document.getElementById('dropZone').style.display = 'block';
+}
+
+// File input change
+document.getElementById('fFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > MAX_SIZE) {
+    showError('حجم الملف يتجاوز الحد الأقصى (50 MB).');
+    return;
+  }
+  showFile(file);
+});
+
+// Drag & drop
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  dz.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.pdf') && file.type !== 'application/pdf') {
+    showError('يُسمح فقط برفع ملفات PDF.');
+    return;
+  }
+  if (file.size > MAX_SIZE) {
+    showError('حجم الملف يتجاوز الحد الأقصى (50 MB).');
+    return;
+  }
+  showFile(file);
+});
+
+document.getElementById('removeFile').addEventListener('click', clearFile);
+
+function showError(msg) {
+  document.getElementById('errorMsg').textContent = msg;
+  const el = document.getElementById('alertError');
+  el.classList.add('show');
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(() => el.classList.remove('show'), 6000);
+}
+
+function setProgress(pct, text) {
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = text;
+}
+
+// ── Submit ──
+document.getElementById('uploadForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const title   = document.getElementById('fTitle').value.trim();
+  const author  = document.getElementById('fAuthor').value.trim();
+  const grade   = document.getElementById('fGrade').value;
+  const subject = document.getElementById('fSubject').value;
+  const notes   = document.getElementById('fNotes').value.trim();
+
+  // Validation
+  if (!title)   { showError('يرجى إدخال عنوان الملف.'); return; }
+  if (!grade)   { showError('يرجى اختيار الصف الدراسي.'); return; }
+  if (!subject) { showError('يرجى اختيار المادة الدراسية.'); return; }
+  if (!selectedFile) { showError('يرجى اختيار ملف PDF.'); return; }
+
+  // UI — start uploading
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  document.getElementById('submitIcon').textContent = '⏳';
+  document.getElementById('submitLabel').textContent = 'جاري الرفع…';
+  document.getElementById('progressWrap').classList.add('active');
+  setProgress(10, 'جاري رفع الملف…');
+
+  try {
+    // 1. Upload PDF to Supabase Storage
+    const timestamp = Date.now();
+    const safeName  = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const storagePath = `${grade}/${subject}/${timestamp}_${safeName}`;
+
+    setProgress(30, 'جاري رفع الملف إلى التخزين…');
+
+    const { data: storageData, error: storageError } = await sb.storage
+      .from('manahil')
+      .upload(storagePath, selectedFile, { cacheControl: '3600', upsert: false });
+
+    if (storageError) throw storageError;
+
+    setProgress(70, 'جاري حفظ البيانات…');
+
+    // 2. Get public URL
+    const { data: urlData } = sb.storage.from('manahil').getPublicUrl(storagePath);
+    const fileUrl = urlData.publicUrl;
+
+    // 3. Insert record into manahil_files
+    const { error: dbError } = await sb.from('manahil_files').insert({
+      title,
+      author: author || null,
+      grade,
+      subject,
+      notes: notes || null,
+      file_url:  fileUrl,
+      file_name: selectedFile.name,
+      file_size: selectedFile.size,
+    });
+
+    if (dbError) throw dbError;
+
+    setProgress(100, 'تم بنجاح!');
+
+    // Show success
+    document.getElementById('alertSuccess').classList.add('show');
+    document.getElementById('alertSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Reset form
+    document.getElementById('uploadForm').reset();
+    clearFile();
+
+  } catch (err) {
+    console.error(err);
+    showError('حدث خطأ: ' + (err.message || 'يرجى المحاولة لاحقاً.'));
+  } finally {
+    btn.disabled = false;
+    document.getElementById('submitIcon').textContent = '📤';
+    document.getElementById('submitLabel').textContent = 'رفع ملف آخر';
+    setTimeout(() => {
+      document.getElementById('progressWrap').classList.remove('active');
+      setProgress(0, '');
+    }, 2000);
+  }
+});
+</script>
+</body>
+</html>
