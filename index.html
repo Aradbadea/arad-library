@@ -297,7 +297,7 @@
     .section-row { scroll-margin-top:170px; }
     .filter-btn.challenge-btn { background:linear-gradient(135deg,#0F7B5C,#0A5240); color:#fff; border-color:transparent; }
     .filter-btn.challenge-btn.active { box-shadow:0 0 0 3px #F2C14E; }
-    .challenge-section { max-width:960px; margin:28px auto 24px; padding:0 32px; }
+    .challenge-section { max-width:924px; margin:0 auto; padding:0 32px 24px; }
     .challenge-banner {
       position:relative; overflow:hidden; cursor:pointer;
       background:linear-gradient(120deg,#0A5240 0%,#0F7B5C 55%,#139670 100%);
@@ -603,6 +603,20 @@
     </div>
   </section>
 
+  <!-- تحدي القراءة العربي BANNER (replaces the old مناهل الزاد banner) -->
+  <div class="challenge-section" id="challengeSection">
+    <div class="challenge-banner" onclick="openChallenge()" role="button" tabindex="0">
+      <div class="challenge-text">
+        <span class="challenge-eyebrow" id="chEyebrow">🏆 تحدي القراءة العربي</span>
+        <h2 id="chTitle">هل أنتِ مستعدة للتحدي؟</h2>
+        <p id="chDesc">كتب عربية مختارة لتملئي بها جوازات التحدي — خمسون كتاباً، خمسة جوازات، ورحلة لا تُنسى.</p>
+        <span class="challenge-cta" id="chCta">ابدئي القراءة ←</span>
+      </div>
+      <div class="challenge-covers" id="chCovers"></div>
+    </div>
+  </div>
+
+
   <!-- FILTERS -->
   <div class="filters-wrap">
     <button class="filter-btn active" data-cat="all"         data-ar="الكل"               data-en="All"              onclick="filterBy(this)">الكل</button>
@@ -624,19 +638,6 @@
 
   <!-- MAIN -->
   <main>
-
-    <!-- تحدي القراءة العربي BANNER (homepage only) -->
-    <div class="challenge-section" id="challengeSection">
-      <div class="challenge-banner" onclick="openChallenge()" role="button" tabindex="0">
-        <div class="challenge-text">
-          <span class="challenge-eyebrow" id="chEyebrow">🏆 تحدي القراءة العربي</span>
-          <h2 id="chTitle">هل أنتِ مستعدة للتحدي؟</h2>
-          <p id="chDesc">كتب عربية مختارة لتملئي بها جوازات التحدي — خمسون كتاباً، خمسة جوازات، ورحلة لا تُنسى.</p>
-          <span class="challenge-cta" id="chCta">ابدئي القراءة ←</span>
-        </div>
-        <div class="challenge-covers" id="chCovers"></div>
-      </div>
-    </div>
 
     <!-- SUMMER READS SECTION (auto-shown June–Aug) -->
     <div class="summer-section" id="summerSection" style="display:none;">
@@ -719,7 +720,10 @@
     // BOOK DATA — 100 books across 8 categories
     // To add a book: copy an entry, update values, place PDF in /books/
     // ────────────────────────────────────────────
-    const books = (window.LIBRARY_BOOKS || []).slice();
+    // Everything the site knows about; `books` is the visible subset (hidden ones removed)
+    const ORIGINAL_BOOKS = (window.LIBRARY_BOOKS || []).slice();
+    let uploadedBooks = [];
+    const books = ORIGINAL_BOOKS.slice();
 
     const tagLabels = {
       citizenship: { ar: "المواطنة",              en: "Citizenship"      },
@@ -952,8 +956,6 @@
       // Show/hide summer banner only on homepage
       const summerSec = document.getElementById('summerSection');
       if (summerSec) summerSec.style.display = (currentFilter === 'all' && !query && isSummer()) ? 'block' : 'none';
-      const chSec = document.getElementById('challengeSection');
-      if (chSec) chSec.style.display = (currentFilter === 'all' && !query) ? 'block' : 'none';
       renderChallengeBanner(isEn);
       // If on homepage (all, no search) show category blocks
       if (currentFilter === 'all' && !query) {
@@ -1082,16 +1084,29 @@
     // To add/remove an existing book, add/remove its id here.
     // Books uploaded from the dashboard use the "ضمن تحدي القراءة" checkbox instead.
     const CHALLENGE_IDS = window.DEFAULT_CHALLENGE_IDS || [];
-    // Choices made in the dashboard for original books (table: challenge_picks)
-    let challengeOverrides = {};
+    // Dashboard choices for original books (table: book_settings) — { id: {in_challenge, hidden} }
+    let bookSettings = {};
 
+    // The challenge is an extra tag on top of a book's own category
     function inCategory(b, cat) {
       if (cat === 'arabic_reading') {
-        if (b.category === 'arabic_reading' || b.in_challenge === true) return true;
-        if (b.id in challengeOverrides) return challengeOverrides[b.id];
+        if (b.id > 100000) return b.in_challenge === true || b.category === 'arabic_reading';
+        const st = bookSettings[b.id];
+        if (st && st.in_challenge !== null && st.in_challenge !== undefined) return st.in_challenge;
         return CHALLENGE_IDS.includes(b.id);
       }
       return b.category === cat;
+    }
+
+    function isHidden(b) {
+      if (b.id > 100000) return b.hidden === true;
+      return !!(bookSettings[b.id] && bookSettings[b.id].hidden);
+    }
+
+    function rebuildBooks() {
+      books.length = 0;
+      ORIGINAL_BOOKS.concat(uploadedBooks).filter(b => !isHidden(b)).forEach(b => books.push(b));
+      renderBooks();
     }
 
     function openChallenge() {
@@ -1125,28 +1140,24 @@
     async function loadLibraryBooks() {
       if (!sb) return;
       try {
-        const picks = await sb.from('challenge_picks').select('book_id,in_challenge');
-        if (!picks.error && picks.data) {
-          challengeOverrides = {};
-          picks.data.forEach(r => { challengeOverrides[r.book_id] = !!r.in_challenge; });
-          renderBooks();
+        const st = await sb.from('book_settings').select('book_id,in_challenge,hidden');
+        if (!st.error && st.data) {
+          bookSettings = {};
+          st.data.forEach(r => { bookSettings[r.book_id] = { in_challenge: r.in_challenge, hidden: !!r.hidden }; });
         }
-      } catch (e) { console.warn('challenge_picks', e); }
+      } catch (e) { console.warn('book_settings', e); }
       try {
         const { data, error } = await sb.from('library_books').select('*').order('created_at', { ascending: false });
-        if (error || !data) return;
-        data.forEach(r => {
-          books.push({
+        if (!error && data) uploadedBooks = data.map(r => ({
             id: 100000 + Number(r.id),
             title_ar: r.title_ar, title_en: r.title_en || r.title_ar,
             author_ar: r.author_ar || '', author_en: r.author_en || r.author_ar || '',
             category: r.category || 'arabic_reading', lang: r.lang || 'arabic',
             emoji: r.emoji || '📗', isbn: '', publisher: r.publisher || '', year: r.year || '',
-            file: r.file_url, cover: r.cover_url || '', in_challenge: !!r.in_challenge,
-          });
-        });
-        renderBooks();
+            file: r.file_url, cover: r.cover_url || '', in_challenge: !!r.in_challenge, hidden: !!r.hidden,
+          }));
       } catch (e) { console.warn('loadLibraryBooks', e); }
+      rebuildBooks();
     }
 
     // ── SUMMER READS — IDs of hand-picked books ──
@@ -1220,37 +1231,5 @@
   </div>
 
 
-  <!-- ══ مناهل الزاد banner — links to manahil.html ══ -->
-  <script>
-  (function() {
-    // Insert banner after the hero section
-    var hero = document.querySelector('.hero-banner') || document.querySelector('.filters') || document.querySelector('header');
-    if (!hero) return;
-    var banner = document.createElement('div');
-    banner.id = 'manahilBanner';
-    banner.innerHTML = `
-      <a href="manahil.html" style="
-        display:flex; align-items:center; justify-content:space-between;
-        background:linear-gradient(135deg,#1B4FBC,#0E2D6B);
-        color:white; border-radius:16px; padding:18px 24px;
-        text-decoration:none; transition:transform .2s, box-shadow .2s;
-        box-shadow:0 4px 20px rgba(27,79,188,0.25);
-        max-width:860px; margin:0 auto;
-      "
-      onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(27,79,188,0.35)'"
-      onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(27,79,188,0.25)'">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="font-size:2rem;background:rgba(255,255,255,0.15);border-radius:12px;padding:8px 12px;">🌿</div>
-          <div>
-            <div style="font-size:1.05rem;font-weight:800;margin-bottom:2px;">مناهل الزاد</div>
-            <div style="font-size:.85rem;opacity:.85;">ملفات ومواد دراسية من معلماتك — منظّمة حسب الصف والمادة</div>
-          </div>
-        </div>
-        <div style="font-size:1.4rem;opacity:.8;">←</div>
-      </a>`;
-    banner.style.cssText = 'padding:0 32px 24px;';
-    hero.insertAdjacentElement('afterend', banner);
-  })();
-  </script>
 </body>
 </html>
