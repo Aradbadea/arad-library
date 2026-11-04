@@ -59,8 +59,17 @@ window.LIBRARY_BOOKS = [
 
       // ── التقويم الأكاديمي ──
       { id:38, title_ar:"التقويم الأكاديمي ٢٠٢٦–٢٠٢٧",     title_en:"Academic Calendar 2026-2027",          author_ar:"وزارة التربية والتعليم",  author_en:"Ministry of Education",  category:"calendar",    lang:"arabic",  emoji:"📅", isbn:"",    publisher:"وزارة التربية والتعليم", year:"2026", file:"School-Calendar-2026-2027.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/School-Calendar-2026-2027.jpg" },
+
+      // ── قصص مضافة — تحدي القراءة العربي ──
+      { id:39, title_ar:"الغراب بلاكي", title_en:"Blacky the Crow", author_ar:"ثورنتون دبليو برجس", author_en:"Thornton W. Burgess", category:"stories", lang:"arabic", emoji:"🐦", isbn:"", publisher:"مؤسسة هنداوي", year:"", file:"blacky-the-crow.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/blacky-the-crow.jpg" },
+      { id:40, title_ar:"الأطفال الخمسة وعفريت الرمال", title_en:"Five Children and It", author_ar:"إديث نسبيت", author_en:"E. Nesbit", category:"stories", lang:"arabic", emoji:"🏖️", isbn:"", publisher:"مؤسسة هنداوي", year:"", file:"five-children-and-it.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/five-children-and-it.jpg" },
+      { id:41, title_ar:"الجدة ثعلبة العجوز", title_en:"Old Granny Fox", author_ar:"ثورنتون دبليو برجس", author_en:"Thornton W. Burgess", category:"stories", lang:"arabic", emoji:"🦊", isbn:"", publisher:"مؤسسة هنداوي", year:"", file:"old-granny-fox.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/old-granny-fox.jpg" },
+      { id:42, title_ar:"حفرة الذئاب", title_en:"Wolf Hollow", author_ar:"لورين ووك", author_en:"Lauren Wolk", category:"stories", lang:"arabic", emoji:"🐺", isbn:"", publisher:"مؤسسة هنداوي", year:"", file:"wolf-hollow.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/wolf-hollow.jpg" },
+      { id:43, title_ar:"السيف الأزرق", title_en:"The Blue Sword", author_ar:"روبين مكينلي", author_en:"Robin McKinley", category:"stories", lang:"arabic", emoji:"⚔️", isbn:"", publisher:"مؤسسة هنداوي", year:"", file:"blue-sword.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/blue-sword.jpg" },
+      { id:44, title_ar:"مغامرات القندس بادي", title_en:"The Adventures of Paddy the Beaver", author_ar:"ثورنتون دبليو برجس", author_en:"Thornton W. Burgess", category:"stories", lang:"arabic", emoji:"🦫", isbn:"", publisher:"مؤسسة هنداوي", year:"", file:"paddy-the-beaver.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/paddy-the-beaver.jpg" },
+      { id:45, title_ar:"مغامرات بوب وايت", title_en:"The Adventures of Bob White", author_ar:"ثورنتون دبليو برجس", author_en:"Thornton W. Burgess", category:"stories", lang:"arabic", emoji:"🐤", isbn:"", publisher:"مؤسسة هنداوي", year:"", file:"bob-white.pdf", cover:"https://raw.githubusercontent.com/Aradbadea/arad-library/main/covers/bob-white.jpg" },
 ];
 
 // Original books that appear in تحدي القراءة العربي by default.
 // Your mom can switch any of them on/off from the dashboard (that choice wins).
-window.DEFAULT_CHALLENGE_IDS = [3, 8, 12, 18, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37];
+window.DEFAULT_CHALLENGE_IDS = [3, 8, 12, 18, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37, 39, 40, 41, 42, 43, 44, 45];
