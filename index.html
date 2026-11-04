@@ -293,6 +293,44 @@
     }
     .empty .empty-icon { font-size: 48px; margin-bottom: 12px; }
 
+    /* ── تحدي القراءة العربي ── */
+    .section-row { scroll-margin-top:170px; }
+    .filter-btn.challenge-btn { background:linear-gradient(135deg,#0F7B5C,#0A5240); color:#fff; border-color:transparent; }
+    .filter-btn.challenge-btn.active { box-shadow:0 0 0 3px #F2C14E; }
+    .challenge-section { max-width:960px; margin:28px auto 24px; padding:0 32px; }
+    .challenge-banner {
+      position:relative; overflow:hidden; cursor:pointer;
+      background:linear-gradient(120deg,#0A5240 0%,#0F7B5C 55%,#139670 100%);
+      color:#fff; border-radius:20px; padding:26px 28px;
+      display:flex; align-items:center; gap:24px; flex-wrap:wrap;
+      box-shadow:0 6px 24px rgba(10,82,64,0.28); transition:transform .2s, box-shadow .2s;
+    }
+    .challenge-banner:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(10,82,64,0.36); }
+    .challenge-banner::after {
+      content:""; position:absolute; inset:auto -60px -80px auto; width:220px; height:220px;
+      border-radius:50%; background:rgba(242,193,78,0.18); pointer-events:none;
+    }
+    .challenge-text { flex:1 1 280px; position:relative; z-index:1; }
+    .challenge-eyebrow { display:inline-block; font-size:12px; font-weight:700; background:#F2C14E; color:#3B2A00; padding:3px 12px; border-radius:20px; margin-bottom:10px; }
+    .challenge-text h2 { font-size:24px; font-weight:800; margin:0 0 6px; }
+    .challenge-text p  { font-size:14px; margin:0 0 14px; opacity:.92; line-height:1.7; }
+    .challenge-cta { display:inline-flex; align-items:center; gap:8px; background:#fff; color:#0A5240; font-weight:800; font-size:14px; padding:9px 20px; border-radius:24px; }
+    .challenge-covers { display:flex; gap:10px; position:relative; z-index:1; padding-bottom:8px; }
+    .challenge-covers .mini {
+      width:62px; aspect-ratio:3/4; border-radius:8px; overflow:hidden; background:rgba(255,255,255,0.15);
+      display:flex; align-items:center; justify-content:center; font-size:26px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.25); border:2px solid rgba(255,255,255,0.5);
+    }
+    .challenge-covers .mini:nth-child(even) { transform:translateY(8px); }
+    .challenge-covers .mini img { width:100%; height:100%; object-fit:cover; display:block; }
+    @media (max-width:640px) {
+      .challenge-section { padding:0 16px; }
+      .challenge-banner { padding:20px; }
+      .challenge-text h2 { font-size:20px; }
+      .challenge-covers .mini { width:48px; }
+      .challenge-covers .mini:nth-child(n+5) { display:none; }
+    }
+
     /* ── SUMMER READS BANNER ── */
     .summer-section {
       max-width: 960px;
@@ -579,13 +617,26 @@
     <button class="filter-btn"        data-cat="calendar"    data-ar="التقويم الأكاديمي"   data-en="Academic Calendar" onclick="filterBy(this)">التقويم</button>
     <a href="manahil.html" class="filter-btn" style="text-decoration:none;background:linear-gradient(135deg,#1B4FBC,#0E2D6B);color:white;border-color:transparent;">🌿 مناهل الزاد</a>
     <button class="filter-btn"        data-cat="special"     data-ar="دعم الفئات"          data-en="Special Support"  onclick="filterBy(this)">دعم الفئات</button>
-    <button class="filter-btn"        data-cat="arabic_reading" data-ar="تحدي القراءة العربي"  data-en="Arab Reading Challenge" onclick="filterBy(this)">تحدي القراءة العربي</button>
+    <button class="filter-btn challenge-btn" data-cat="arabic_reading" data-ar="🏆 تحدي القراءة العربي"  data-en="🏆 Arab Reading Challenge" onclick="filterBy(this)">🏆 تحدي القراءة العربي</button>
     <button class="filter-btn" data-cat="summer" data-ar="صيفنا قراءة ☀️" data-en="Summer Reads ☀️" onclick="filterBy(this)" id="summerFilterBtn" style="display:none;background:linear-gradient(135deg,#F9A825,#FF6F00);color:white;border-color:transparent;">صيفنا قراءة ☀️</button>
 
   </div>
 
   <!-- MAIN -->
   <main>
+
+    <!-- تحدي القراءة العربي BANNER (homepage only) -->
+    <div class="challenge-section" id="challengeSection">
+      <div class="challenge-banner" onclick="openChallenge()" role="button" tabindex="0">
+        <div class="challenge-text">
+          <span class="challenge-eyebrow" id="chEyebrow">🏆 تحدي القراءة العربي</span>
+          <h2 id="chTitle">هل أنتِ مستعدة للتحدي؟</h2>
+          <p id="chDesc">كتب عربية مختارة لتملئي بها جوازات التحدي — خمسون كتاباً، خمسة جوازات، ورحلة لا تُنسى.</p>
+          <span class="challenge-cta" id="chCta">ابدئي القراءة ←</span>
+        </div>
+        <div class="challenge-covers" id="chCovers"></div>
+      </div>
+    </div>
 
     <!-- SUMMER READS SECTION (auto-shown June–Aug) -->
     <div class="summer-section" id="summerSection" style="display:none;">
@@ -878,7 +929,7 @@
       };
       let catHtml = '';
       catOrder.forEach(cat => {
-        const catBooks = books.filter(b => b.category === cat);
+        const catBooks = books.filter(b => inCategory(b, cat));
         const label = tagLabels[cat]?.[isEn ? 'en' : 'ar'] || cat;
         const emoji = catEmojis[cat] || '📚';
         catHtml += `
@@ -956,6 +1007,9 @@
       // Show/hide summer banner only on homepage
       const summerSec = document.getElementById('summerSection');
       if (summerSec) summerSec.style.display = (currentFilter === 'all' && !query && isSummer()) ? 'block' : 'none';
+      const chSec = document.getElementById('challengeSection');
+      if (chSec) chSec.style.display = (currentFilter === 'all' && !query) ? 'block' : 'none';
+      renderChallengeBanner(isEn);
       // If on homepage (all, no search) show category blocks
       if (currentFilter === 'all' && !query) {
         renderCategoryBlocks(isEn, grid);
@@ -964,7 +1018,7 @@
 
       let filtered = books.filter(b => {
         const isSummerFilter = currentFilter === 'summer';
-        const matchCat = currentFilter === 'all' || b.category === currentFilter || (isSummerFilter && SUMMER_IDS.includes(b.id));
+        const matchCat = currentFilter === 'all' || inCategory(b, currentFilter) || (isSummerFilter && SUMMER_IDS.includes(b.id));
         const titleSearch = (isEn ? b.title_en : b.title_ar).toLowerCase();
         const authSearch  = (isEn ? b.author_en : b.author_ar).toLowerCase();
         const matchSearch = !query || titleSearch.includes(query) || authSearch.includes(query);
@@ -1079,6 +1133,63 @@
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
 
+    // ── تحدي القراءة العربي — IDs of existing books in the challenge ──
+    // To add/remove an existing book, add/remove its id here.
+    // Books uploaded from the dashboard use the "ضمن تحدي القراءة" checkbox instead.
+    const CHALLENGE_IDS = [3, 8, 12, 18, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 37];
+
+    function inCategory(b, cat) {
+      if (cat === 'arabic_reading') return b.category === 'arabic_reading' || b.in_challenge === true || CHALLENGE_IDS.includes(b.id);
+      return b.category === cat;
+    }
+
+    function openChallenge() {
+      filterByCategory('arabic_reading');
+      const row = document.querySelector('.section-row');
+      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('challenge-banner')) openChallenge();
+    });
+
+    function renderChallengeBanner(isEn) {
+      const el = (id) => document.getElementById(id);
+      if (!el('chCovers')) return;
+      const picks = books.filter(b => inCategory(b, 'arabic_reading'));
+      el('chEyebrow').textContent = isEn ? '🏆 Arab Reading Challenge' : '🏆 تحدي القراءة العربي';
+      el('chTitle').textContent   = isEn ? 'Are you ready for the challenge?' : 'هل أنتِ مستعدة للتحدي؟';
+      el('chDesc').textContent    = isEn
+        ? 'Hand-picked Arabic books to fill your challenge passports — fifty books, five passports, one unforgettable journey.'
+        : 'كتب عربية مختارة لتملئي بها جوازات التحدي — خمسون كتاباً، خمسة جوازات، ورحلة لا تُنسى.';
+      el('chCta').innerHTML = (isEn ? 'Start reading' : 'ابدئي القراءة') +
+        ` <span style="background:#F2C14E;color:#3B2A00;border-radius:12px;padding:1px 9px;font-size:12px;">${picks.length} ${isEn ? 'books' : 'كتاب'}</span> ` + (isEn ? '→' : '←');
+      // newest uploads first, then the rest
+      const shown = picks.slice().sort((a, b) => (b.id > 100000) - (a.id > 100000)).slice(0, 6);
+      el('chCovers').innerHTML = shown.map(b => b.cover
+        ? `<div class="mini"><img src="${b.cover}" alt="" loading="lazy" onerror="this.parentElement.textContent='${b.emoji || '📗'}'"></div>`
+        : `<div class="mini">${b.emoji || '📗'}</div>`).join('');
+    }
+
+    // ── Books uploaded from the dashboard (Supabase table: library_books) ──
+    async function loadLibraryBooks() {
+      if (!sb) return;
+      try {
+        const { data, error } = await sb.from('library_books').select('*').order('created_at', { ascending: false });
+        if (error || !data) return;
+        data.forEach(r => {
+          books.push({
+            id: 100000 + Number(r.id),
+            title_ar: r.title_ar, title_en: r.title_en || r.title_ar,
+            author_ar: r.author_ar || '', author_en: r.author_en || r.author_ar || '',
+            category: r.category || 'arabic_reading', lang: r.lang || 'arabic',
+            emoji: r.emoji || '📗', isbn: '', publisher: r.publisher || '', year: r.year || '',
+            file: r.file_url, cover: r.cover_url || '', in_challenge: !!r.in_challenge,
+          });
+        });
+        renderBooks();
+      } catch (e) { console.warn('loadLibraryBooks', e); }
+    }
+
     // ── SUMMER READS — IDs of hand-picked books ──
     // Change these IDs or add/remove to update the summer list
     // Summer window: 1 June – 31 August
@@ -1136,6 +1247,7 @@
     } catch(e) {}
     initSummer();
     renderBooks();
+    loadLibraryBooks();
   </script>
 
   <!-- ── SUMMER PAGE ── -->
