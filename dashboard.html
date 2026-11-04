@@ -491,7 +491,7 @@
     </div>
 
     <div class="section-header">
-      <div class="section-title">الكتب المرفوعة</div>
+      <div class="section-title">الكتب المرفوعة من لوحة التحكم</div>
     </div>
     <div class="panel">
       <table>
@@ -505,6 +505,30 @@
         </tr></thead>
         <tbody id="booksBody">
           <tr><td colspan="6" class="empty-state">جارٍ التحميل...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-header" style="margin-top:28px;">
+      <div class="section-title">الكتب الأصلية في المكتبة</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select id="origCatFilter" onchange="renderOriginalBooks()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;background:white;">
+          <option value="">كل التصنيفات</option>
+          <option value="__challenge">🏆 ضمن التحدي فقط</option>
+        </select>
+        <span class="pill green" id="origCount">0 كتاب</span>
+      </div>
+    </div>
+    <div class="panel">
+      <table>
+        <thead><tr>
+          <th>الكتاب</th>
+          <th>التصنيف</th>
+          <th>التحدي</th>
+          <th>فتح</th>
+        </tr></thead>
+        <tbody id="origBody">
+          <tr><td colspan="4" class="empty-state">جارٍ التحميل...</td></tr>
         </tbody>
       </table>
     </div>
@@ -546,6 +570,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="books-data.js"></script>
 <script>
   const SB_URL = 'https://tjdznavmbudvjngdekqr.supabase.co';
   const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqZHpuYXZtYnVkdmpuZ2Rla3FyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDQ1ODIsImV4cCI6MjA5Njc4MDU4Mn0.WI9KndkDyCk8IuxqcacNkui-9tCXFy3XR-z8Tast2tM';
@@ -623,7 +648,7 @@
   // ── LOAD ALL ──
   async function loadData() {
     document.getElementById('statLastUpdate').textContent = fmt(new Date().toISOString());
-    await Promise.all([loadSessions(), loadReads(), loadManahil(), loadBooks()]);
+    await Promise.all([loadSessions(), loadReads(), loadManahil(), loadBooks(), loadOriginalBooks()]);
   }
 
   // ── SESSIONS ──
@@ -926,6 +951,66 @@
         <td style="color:var(--muted);font-size:13px;">${fmtSize(b.file_size)}</td>
         <td><button class="btn-del" onclick="deleteBook(${b.id})">🗑️ حذف</button></td>
       </tr>`).join('');
+  }
+
+  // ── ORIGINAL BOOKS (books-data.js) + challenge on/off (table: challenge_picks) ──
+  const ORIG_BOOKS = window.LIBRARY_BOOKS || [];
+  const DEFAULT_IDS = window.DEFAULT_CHALLENGE_IDS || [];
+  let _picks = {}, _picksReady = false;
+
+  (function fillOrigFilter() {
+    const sel = document.getElementById('origCatFilter');
+    [...new Set(ORIG_BOOKS.map(b => b.category))].forEach(c => {
+      const o = document.createElement('option'); o.value = c; o.textContent = CAT_LABELS[c] || c; sel.appendChild(o);
+    });
+  })();
+
+  function origInChallenge(b) {
+    return (b.id in _picks) ? _picks[b.id] : DEFAULT_IDS.includes(b.id);
+  }
+
+  async function loadOriginalBooks() {
+    const { data, error } = await sb.from('challenge_picks').select('book_id,in_challenge');
+    _picksReady = !error;
+    _picks = {};
+    (data || []).forEach(r => { _picks[r.book_id] = !!r.in_challenge; });
+    renderOriginalBooks();
+  }
+
+  function renderOriginalBooks() {
+    const tbody = document.getElementById('origBody');
+    const f = document.getElementById('origCatFilter').value;
+    const list = ORIG_BOOKS.filter(b => !f || (f === '__challenge' ? origInChallenge(b) : b.category === f));
+    const inCh = ORIG_BOOKS.filter(origInChallenge).length;
+    document.getElementById('origCount').textContent = `${ORIG_BOOKS.length} كتاب · 🏆 ${inCh} ضمن التحدي`;
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state">لا توجد كتب</div></td></tr>'; return; }
+    tbody.innerHTML = list.map(b => {
+      const on = origInChallenge(b);
+      return `<tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            ${b.cover ? `<img src="${b.cover}" alt="" loading="lazy" style="width:34px;height:46px;object-fit:cover;border-radius:4px;" onerror="this.style.visibility='hidden'">` : `<span style="font-size:26px;">${b.emoji}</span>`}
+            <div>
+              <div style="font-weight:700;">${b.title_ar}</div>
+              <div style="font-size:12px;color:var(--muted);">${b.author_ar || '—'}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:13px;">${CAT_LABELS[b.category] || b.category}</td>
+        <td>${_picksReady
+          ? `<button class="bk-toggle ${on ? 'on' : 'off'}" onclick="toggleOriginal(${b.id})">${on ? '🏆 ضمن التحدي' : '+ إضافة للتحدي'}</button>`
+          : `<span style="font-size:12px;color:var(--muted);">${on ? '🏆 ضمن التحدي' : '—'}</span>`}</td>
+        <td><a href="${b.file}" target="_blank" style="color:var(--accent);font-size:13px;text-decoration:none;">📄 فتح</a></td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function toggleOriginal(id) {
+    const next = !origInChallenge(ORIG_BOOKS.find(b => b.id === id));
+    const { error } = await sb.from('challenge_picks').upsert({ book_id: id, in_challenge: next }, { onConflict: 'book_id' });
+    if (error) { alert('حدث خطأ: ' + error.message); return; }
+    _picks[id] = next;
+    renderOriginalBooks();
   }
 
   async function toggleChallenge(id) {
