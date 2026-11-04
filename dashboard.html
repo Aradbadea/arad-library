@@ -239,6 +239,9 @@
     .bk-toggle { border:none; border-radius:10px; padding:4px 10px; font-size:12px; font-weight:700; cursor:pointer; font-family:var(--font); }
     .bk-toggle.on  { background:#E8F5EF; color:#0F7B5C; }
     .bk-toggle.off { background:#F1F1F1; color:#888; }
+    .bk-toggle.shown { background:#EBF0FB; color:#1B4FBC; }
+    .bk-toggle.hiddenb { background:#FDECEA; color:#C62828; }
+    tr.is-hidden td:first-child, tr.is-hidden td:nth-child(2) { opacity:.45; }
     @media (max-width:700px) { .bk-grid { grid-template-columns:1fr; } }
 </style>
 </head>
@@ -440,7 +443,7 @@
         <div>
           <label class="field-label">التصنيف *</label>
           <select class="field-input" id="bkCategory">
-            <option value="arabic_reading">تحدي القراءة العربي</option>
+            <option value="">— اختاري التصنيف —</option>
             <option value="stories">القصص والروايات</option>
             <option value="heritage">التراث العربي</option>
             <option value="islamic">الحضارة الإسلامية</option>
@@ -464,7 +467,7 @@
 
       <label class="bk-check">
         <input type="checkbox" id="bkChallenge" checked />
-        <span>🏆 يظهر أيضاً ضمن <strong>تحدي القراءة العربي</strong></span>
+        <span>🏆 إضافة إلى <strong>تحدي القراءة العربي</strong> <span style="font-weight:400;color:#3E7A66;">(إضافةً إلى تصنيفه)</span></span>
       </label>
 
       <div class="bk-grid" style="margin-top:14px;">
@@ -499,12 +502,13 @@
           <th>الكتاب</th>
           <th>التصنيف</th>
           <th>التحدي</th>
+          <th>الظهور</th>
           <th>تاريخ الرفع</th>
           <th>الحجم</th>
           <th>إجراءات</th>
         </tr></thead>
         <tbody id="booksBody">
-          <tr><td colspan="6" class="empty-state">جارٍ التحميل...</td></tr>
+          <tr><td colspan="7" class="empty-state">جارٍ التحميل...</td></tr>
         </tbody>
       </table>
     </div>
@@ -515,6 +519,7 @@
         <select id="origCatFilter" onchange="renderOriginalBooks()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font);font-size:13px;background:white;">
           <option value="">كل التصنيفات</option>
           <option value="__challenge">🏆 ضمن التحدي فقط</option>
+          <option value="__hidden">🚫 المخفية فقط</option>
         </select>
         <span class="pill green" id="origCount">0 كتاب</span>
       </div>
@@ -525,10 +530,11 @@
           <th>الكتاب</th>
           <th>التصنيف</th>
           <th>التحدي</th>
+          <th>الظهور</th>
           <th>فتح</th>
         </tr></thead>
         <tbody id="origBody">
-          <tr><td colspan="4" class="empty-state">جارٍ التحميل...</td></tr>
+          <tr><td colspan="5" class="empty-state">جارٍ التحميل...</td></tr>
         </tbody>
       </table>
     </div>
@@ -840,9 +846,6 @@
     if (f) { const u = URL.createObjectURL(f); prev.innerHTML = `<img src="${u}" alt="">`; }
     else prev.textContent = '🖼️';
   });
-  document.getElementById('bkCategory').addEventListener('change', e => {
-    if (e.target.value === 'arabic_reading') document.getElementById('bkChallenge').checked = true;
-  });
 
   function bkMsg(text, kind) {
     const m = document.getElementById('bkMsg');
@@ -860,11 +863,12 @@
     const publisher= document.getElementById('bkPublisher').value.trim();
     const category = document.getElementById('bkCategory').value;
     const lang     = document.getElementById('bkLang').value;
-    const challenge= document.getElementById('bkChallenge').checked || category === 'arabic_reading';
+    const challenge= document.getElementById('bkChallenge').checked;
     const pdf      = document.getElementById('bkPdf').files[0];
     const cover    = document.getElementById('bkCover').files[0];
 
     if (!titleAr) { bkMsg('يرجى كتابة عنوان الكتاب.', 'err'); return; }
+    if (!category){ bkMsg('يرجى اختيار التصنيف.', 'err'); return; }
     if (!pdf)     { bkMsg('يرجى اختيار ملف الكتاب (PDF).', 'err'); return; }
     if (!/\.pdf$/i.test(pdf.name) && pdf.type !== 'application/pdf') { bkMsg('الملف يجب أن يكون بصيغة PDF.', 'err'); return; }
     if (pdf.size > 50 * 1024 * 1024) { bkMsg('حجم الملف أكبر من ٥٠ ميجابايت — يرجى ضغطه أولاً.', 'err'); return; }
@@ -903,7 +907,7 @@
 
       bkProgress(100);
       bkMsg('✅ تم رفع الكتاب! سيظهر في المكتبة فوراً.', 'ok');
-      ['bkTitleAr','bkTitleEn','bkAuthorAr','bkPublisher','bkPdf','bkCover'].forEach(id => document.getElementById(id).value = '');
+      ['bkTitleAr','bkTitleEn','bkAuthorAr','bkPublisher','bkPdf','bkCover','bkCategory'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('bkPdfName').textContent = 'اضغطي لاختيار الملف';
       document.getElementById('bkCoverName').textContent = 'JPG أو PNG';
       document.getElementById('bkCoverPreview').textContent = '🖼️';
@@ -924,18 +928,18 @@
     const tbody = document.getElementById('booksBody');
     const { data, error } = await sb.from('library_books').select('*').order('created_at', { ascending: false });
     if (error || !data) {
-      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state">تعذّر التحميل — تأكدي من تشغيل ملف الإعداد في Supabase</div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state">تعذّر التحميل — تأكدي من تشغيل ملف الإعداد في Supabase</div></td></tr>';
       return;
     }
     _booksData = data;
     document.getElementById('booksCount').textContent = data.length + ' كتاب';
     if (!data.length) {
-      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📚</div>لم يتم رفع أي كتاب بعد</div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📚</div>لم يتم رفع أي كتاب بعد</div></td></tr>';
       return;
     }
     const esc = (t) => String(t || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     tbody.innerHTML = data.map(b => `
-      <tr>
+      <tr class="${b.hidden ? 'is-hidden' : ''}">
         <td>
           <div style="display:flex;align-items:center;gap:10px;">
             ${b.cover_url ? `<img src="${b.cover_url}" alt="" style="width:34px;height:46px;object-fit:cover;border-radius:4px;">` : '<span style="font-size:26px;">📗</span>'}
@@ -946,17 +950,18 @@
           </div>
         </td>
         <td style="font-size:13px;">${CAT_LABELS[b.category] || b.category}</td>
-        <td><button class="bk-toggle ${b.in_challenge ? 'on' : 'off'}" onclick="toggleChallenge(${b.id})">${b.in_challenge ? '🏆 ضمن التحدي' : 'غير مضاف'}</button></td>
+        <td><button class="bk-toggle ${b.in_challenge ? 'on' : 'off'}" onclick="toggleChallenge(${b.id})">${b.in_challenge ? '🏆 ضمن التحدي' : '+ إضافة للتحدي'}</button></td>
+        <td><button class="bk-toggle ${b.hidden ? 'hiddenb' : 'shown'}" onclick="toggleHiddenUploaded(${b.id})">${b.hidden ? '🚫 مخفي' : '👁 ظاهر'}</button></td>
         <td style="color:var(--muted);font-size:13px;white-space:nowrap;">${fmt(b.created_at)}</td>
         <td style="color:var(--muted);font-size:13px;">${fmtSize(b.file_size)}</td>
         <td><button class="btn-del" onclick="deleteBook(${b.id})">🗑️ حذف</button></td>
       </tr>`).join('');
   }
 
-  // ── ORIGINAL BOOKS (books-data.js) + challenge on/off (table: challenge_picks) ──
+  // ── ORIGINAL BOOKS (books-data.js) — challenge + show/hide (table: book_settings) ──
   const ORIG_BOOKS = window.LIBRARY_BOOKS || [];
   const DEFAULT_IDS = window.DEFAULT_CHALLENGE_IDS || [];
-  let _picks = {}, _picksReady = false;
+  let _settings = {}, _settingsReady = false;
 
   (function fillOrigFilter() {
     const sel = document.getElementById('origCatFilter');
@@ -966,27 +971,32 @@
   })();
 
   function origInChallenge(b) {
-    return (b.id in _picks) ? _picks[b.id] : DEFAULT_IDS.includes(b.id);
+    const st = _settings[b.id];
+    return (st && st.in_challenge !== null && st.in_challenge !== undefined) ? st.in_challenge : DEFAULT_IDS.includes(b.id);
   }
+  function origHidden(b) { return !!(_settings[b.id] && _settings[b.id].hidden); }
 
   async function loadOriginalBooks() {
-    const { data, error } = await sb.from('challenge_picks').select('book_id,in_challenge');
-    _picksReady = !error;
-    _picks = {};
-    (data || []).forEach(r => { _picks[r.book_id] = !!r.in_challenge; });
+    const { data, error } = await sb.from('book_settings').select('book_id,in_challenge,hidden');
+    _settingsReady = !error;
+    _settings = {};
+    (data || []).forEach(r => { _settings[r.book_id] = { in_challenge: r.in_challenge, hidden: !!r.hidden }; });
     renderOriginalBooks();
   }
 
   function renderOriginalBooks() {
     const tbody = document.getElementById('origBody');
     const f = document.getElementById('origCatFilter').value;
-    const list = ORIG_BOOKS.filter(b => !f || (f === '__challenge' ? origInChallenge(b) : b.category === f));
+    const list = ORIG_BOOKS.filter(b => !f
+      || (f === '__challenge' ? origInChallenge(b) : f === '__hidden' ? origHidden(b) : b.category === f));
     const inCh = ORIG_BOOKS.filter(origInChallenge).length;
-    document.getElementById('origCount').textContent = `${ORIG_BOOKS.length} كتاب · 🏆 ${inCh} ضمن التحدي`;
-    if (!list.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state">لا توجد كتب</div></td></tr>'; return; }
+    const hid  = ORIG_BOOKS.filter(origHidden).length;
+    document.getElementById('origCount').textContent = `${ORIG_BOOKS.length} كتاب · 🏆 ${inCh} ضمن التحدي` + (hid ? ` · 🚫 ${hid} مخفي` : '');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">لا توجد كتب</div></td></tr>'; return; }
+    const note = (t) => `<span style="font-size:12px;color:var(--muted);">${t}</span>`;
     tbody.innerHTML = list.map(b => {
-      const on = origInChallenge(b);
-      return `<tr>
+      const on = origInChallenge(b), hidden = origHidden(b);
+      return `<tr class="${hidden ? 'is-hidden' : ''}">
         <td>
           <div style="display:flex;align-items:center;gap:10px;">
             ${b.cover ? `<img src="${b.cover}" alt="" loading="lazy" style="width:34px;height:46px;object-fit:cover;border-radius:4px;" onerror="this.style.visibility='hidden'">` : `<span style="font-size:26px;">${b.emoji}</span>`}
@@ -997,20 +1007,32 @@
           </div>
         </td>
         <td style="font-size:13px;">${CAT_LABELS[b.category] || b.category}</td>
-        <td>${_picksReady
-          ? `<button class="bk-toggle ${on ? 'on' : 'off'}" onclick="toggleOriginal(${b.id})">${on ? '🏆 ضمن التحدي' : '+ إضافة للتحدي'}</button>`
-          : `<span style="font-size:12px;color:var(--muted);">${on ? '🏆 ضمن التحدي' : '—'}</span>`}</td>
+        <td>${_settingsReady
+          ? `<button class="bk-toggle ${on ? 'on' : 'off'}" onclick="setOriginal(${b.id}, 'in_challenge')">${on ? '🏆 ضمن التحدي' : '+ إضافة للتحدي'}</button>`
+          : note(on ? '🏆 ضمن التحدي' : '—')}</td>
+        <td>${_settingsReady
+          ? `<button class="bk-toggle ${hidden ? 'hiddenb' : 'shown'}" onclick="setOriginal(${b.id}, 'hidden')">${hidden ? '🚫 مخفي' : '👁 ظاهر'}</button>`
+          : note('👁 ظاهر')}</td>
         <td><a href="${b.file}" target="_blank" style="color:var(--accent);font-size:13px;text-decoration:none;">📄 فتح</a></td>
       </tr>`;
     }).join('');
   }
 
-  async function toggleOriginal(id) {
-    const next = !origInChallenge(ORIG_BOOKS.find(b => b.id === id));
-    const { error } = await sb.from('challenge_picks').upsert({ book_id: id, in_challenge: next }, { onConflict: 'book_id' });
+  async function setOriginal(id, field) {
+    const b = ORIG_BOOKS.find(x => x.id === id); if (!b) return;
+    const row = { book_id: id, in_challenge: origInChallenge(b), hidden: origHidden(b), updated_at: new Date().toISOString() };
+    row[field] = !row[field];
+    const { error } = await sb.from('book_settings').upsert(row, { onConflict: 'book_id' });
     if (error) { alert('حدث خطأ: ' + error.message); return; }
-    _picks[id] = next;
+    _settings[id] = { in_challenge: row.in_challenge, hidden: row.hidden };
     renderOriginalBooks();
+  }
+
+  async function toggleHiddenUploaded(id) {
+    const b = _booksData.find(x => x.id === id); if (!b) return;
+    const { error } = await sb.from('library_books').update({ hidden: !b.hidden }).eq('id', id);
+    if (error) { alert('حدث خطأ: ' + error.message); return; }
+    loadBooks();
   }
 
   async function toggleChallenge(id) {
